@@ -13,7 +13,8 @@ export const lists = {
   User: list({
     access: allowAll,
     fields: {
-      name: text({ validation: { isRequired: true } }),
+      firstName: text({ validation: { isRequired: true } }),
+      lastName: text({ validation: { isRequired: true } }),
       email: text({ validation: { isRequired: true }, isIndexed: "unique" }),
       password: password({ validation: { isRequired: true } }),
       createdAt: timestamp({

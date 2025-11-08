@@ -3,7 +3,8 @@
 
 type User {
   id: ID!
-  name: String
+  firstName: String
+  lastName: String
   email: String
   password: PasswordState
   createdAt: DateTime
@@ -25,7 +26,8 @@ input UserWhereInput {
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]
   id: IDFilter
-  name: StringFilter
+  firstName: StringFilter
+  lastName: StringFilter
   email: StringFilter
   createdAt: DateTimeNullableFilter
 }
@@ -82,7 +84,8 @@ input DateTimeNullableFilter {
 
 input UserOrderByInput {
   id: OrderDirection
-  name: OrderDirection
+  firstName: OrderDirection
+  lastName: OrderDirection
   email: OrderDirection
   createdAt: OrderDirection
 }
@@ -93,7 +96,8 @@ enum OrderDirection {
 }
 
 input UserUpdateInput {
-  name: String
+  firstName: String
+  lastName: String
   email: String
   password: String
   createdAt: DateTime
@@ -105,7 +109,8 @@ input UserUpdateArgs {
 }
 
 input UserCreateInput {
-  name: String
+  firstName: String
+  lastName: String
   email: String
   password: String
   createdAt: DateTime
@@ -555,7 +560,8 @@ type UserAuthenticationWithPasswordFailure {
 }
 
 input CreateInitialUserInput {
-  name: String
+  firstName: String
+  lastName: String
   email: String
   password: String
 }
