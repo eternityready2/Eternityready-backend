@@ -8,6 +8,7 @@ type User {
   email: String
   password: PasswordState
   createdAt: DateTime
+  privilege: String
 }
 
 type PasswordState {
@@ -30,6 +31,7 @@ input UserWhereInput {
   lastName: StringFilter
   email: StringFilter
   createdAt: DateTimeNullableFilter
+  privilege: StringNullableFilter
 }
 
 input IDFilter {
@@ -82,12 +84,27 @@ input DateTimeNullableFilter {
   not: DateTimeNullableFilter
 }
 
+input StringNullableFilter {
+  equals: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  not: StringNullableFilter
+}
+
 input UserOrderByInput {
   id: OrderDirection
   firstName: OrderDirection
   lastName: OrderDirection
   email: OrderDirection
   createdAt: OrderDirection
+  privilege: OrderDirection
 }
 
 enum OrderDirection {
@@ -101,6 +118,7 @@ input UserUpdateInput {
   email: String
   password: String
   createdAt: DateTime
+  privilege: String
 }
 
 input UserUpdateArgs {
@@ -114,6 +132,7 @@ input UserCreateInput {
   email: String
   password: String
   createdAt: DateTime
+  privilege: String
 }
 
 type Video {
@@ -189,20 +208,6 @@ input VideoWhereInput {
   isRestricted: BooleanFilter
   verificationMessage: StringFilter
   publishedAt: DateTimeNullableFilter
-}
-
-input StringNullableFilter {
-  equals: String
-  in: [String!]
-  notIn: [String!]
-  lt: String
-  lte: String
-  gt: String
-  gte: String
-  contains: String
-  startsWith: String
-  endsWith: String
-  not: StringNullableFilter
 }
 
 input BooleanFilter {
@@ -564,6 +569,7 @@ input CreateInitialUserInput {
   lastName: String
   email: String
   password: String
+  privilege: String
 }
 
 type Query {

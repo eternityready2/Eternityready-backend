@@ -18,6 +18,7 @@ model User {
   email     String    @unique @default("")
   password  String
   createdAt DateTime? @default(now())
+  privilege String?   @default("normal")
 }
 
 model Video {
