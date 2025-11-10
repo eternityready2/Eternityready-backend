@@ -6,7 +6,7 @@ import { Ad } from "./schemas/ad";
 import { Category } from "./schemas/category";
 import { list } from "@keystone-6/core";
 import { Instagram } from "./schemas/instagram";
-import { text, password, timestamp, select } from "@keystone-6/core/fields";
+import { relationship, text, password, timestamp, select } from "@keystone-6/core/fields";
 import { allowAll } from "@keystone-6/core/access";
 
 const isAdmin = ({ session }: { session?: Session }) => {
@@ -30,6 +30,7 @@ export const lists = {
       },
     },
     fields: {
+      answer: relationship({ ref: 'SecurityAnswer', many: true, }),
       firstName: text({ validation: { isRequired: true } }),
       lastName: text({ validation: { isRequired: true } }),
       email: text({ validation: { isRequired: true }, isIndexed: "unique" }),
@@ -53,6 +54,35 @@ export const lists = {
           },
         }
       }),
+    },
+  }),
+  SecurityQuestion: list({
+    access: {
+      operation: {
+        query: allowAll,
+        create: allowAll,
+        update: isAdmin,
+        delete: isAdmin,
+      },
+    },
+    fields: {
+      question: text({ validation: { isRequired: true } }),
+      answer: relationship({ ref: 'SecurityAnswer', many: true, }),
+    },
+  }),
+  SecurityAnswer: list({
+    access: {
+      operation: {
+        query: allowAll,
+        create: allowAll,
+        update: isAdmin,
+        delete: isAdmin,
+      },
+    },
+    fields: {
+      answer: text({ validation: { isRequired: true } }),
+      question: relationship({ ref: 'SecurityQuestion', many: false, }),
+      user: relationship({ ref: 'User', many: false, }),
     },
   }),
   Video,

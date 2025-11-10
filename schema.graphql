@@ -3,6 +3,8 @@
 
 type User {
   id: ID!
+  answer(where: SecurityAnswerWhereInput! = {}, orderBy: [SecurityAnswerOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SecurityAnswerWhereUniqueInput): [SecurityAnswer!]
+  answerCount(where: SecurityAnswerWhereInput! = {}): Int
   firstName: String
   lastName: String
   email: String
@@ -27,6 +29,7 @@ input UserWhereInput {
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]
   id: IDFilter
+  answer: SecurityAnswerManyRelationFilter
   firstName: StringFilter
   lastName: StringFilter
   email: StringFilter
@@ -43,6 +46,12 @@ input IDFilter {
   gt: ID
   gte: ID
   not: IDFilter
+}
+
+input SecurityAnswerManyRelationFilter {
+  every: SecurityAnswerWhereInput
+  some: SecurityAnswerWhereInput
+  none: SecurityAnswerWhereInput
 }
 
 input StringFilter {
@@ -113,12 +122,20 @@ enum OrderDirection {
 }
 
 input UserUpdateInput {
+  answer: SecurityAnswerRelateToManyForUpdateInput
   firstName: String
   lastName: String
   email: String
   password: String
   createdAt: DateTime
   privilege: String
+}
+
+input SecurityAnswerRelateToManyForUpdateInput {
+  disconnect: [SecurityAnswerWhereUniqueInput!]
+  set: [SecurityAnswerWhereUniqueInput!]
+  create: [SecurityAnswerCreateInput!]
+  connect: [SecurityAnswerWhereUniqueInput!]
 }
 
 input UserUpdateArgs {
@@ -127,12 +144,123 @@ input UserUpdateArgs {
 }
 
 input UserCreateInput {
+  answer: SecurityAnswerRelateToManyForCreateInput
   firstName: String
   lastName: String
   email: String
   password: String
   createdAt: DateTime
   privilege: String
+}
+
+input SecurityAnswerRelateToManyForCreateInput {
+  create: [SecurityAnswerCreateInput!]
+  connect: [SecurityAnswerWhereUniqueInput!]
+}
+
+type SecurityQuestion {
+  id: ID!
+  question: String
+  answer(where: SecurityAnswerWhereInput! = {}, orderBy: [SecurityAnswerOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SecurityAnswerWhereUniqueInput): [SecurityAnswer!]
+  answerCount(where: SecurityAnswerWhereInput! = {}): Int
+}
+
+input SecurityQuestionWhereUniqueInput {
+  id: ID
+}
+
+input SecurityQuestionWhereInput {
+  AND: [SecurityQuestionWhereInput!]
+  OR: [SecurityQuestionWhereInput!]
+  NOT: [SecurityQuestionWhereInput!]
+  id: IDFilter
+  question: StringFilter
+  answer: SecurityAnswerManyRelationFilter
+}
+
+input SecurityQuestionOrderByInput {
+  id: OrderDirection
+  question: OrderDirection
+}
+
+input SecurityQuestionUpdateInput {
+  question: String
+  answer: SecurityAnswerRelateToManyForUpdateInput
+}
+
+input SecurityQuestionUpdateArgs {
+  where: SecurityQuestionWhereUniqueInput!
+  data: SecurityQuestionUpdateInput!
+}
+
+input SecurityQuestionCreateInput {
+  question: String
+  answer: SecurityAnswerRelateToManyForCreateInput
+}
+
+type SecurityAnswer {
+  id: ID!
+  answer: String
+  question: SecurityQuestion
+  user: User
+}
+
+input SecurityAnswerWhereUniqueInput {
+  id: ID
+}
+
+input SecurityAnswerWhereInput {
+  AND: [SecurityAnswerWhereInput!]
+  OR: [SecurityAnswerWhereInput!]
+  NOT: [SecurityAnswerWhereInput!]
+  id: IDFilter
+  answer: StringFilter
+  question: SecurityQuestionWhereInput
+  user: UserWhereInput
+}
+
+input SecurityAnswerOrderByInput {
+  id: OrderDirection
+  answer: OrderDirection
+}
+
+input SecurityAnswerUpdateInput {
+  answer: String
+  question: SecurityQuestionRelateToOneForUpdateInput
+  user: UserRelateToOneForUpdateInput
+}
+
+input SecurityQuestionRelateToOneForUpdateInput {
+  create: SecurityQuestionCreateInput
+  connect: SecurityQuestionWhereUniqueInput
+  disconnect: Boolean
+}
+
+input UserRelateToOneForUpdateInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+}
+
+input SecurityAnswerUpdateArgs {
+  where: SecurityAnswerWhereUniqueInput!
+  data: SecurityAnswerUpdateInput!
+}
+
+input SecurityAnswerCreateInput {
+  answer: String
+  question: SecurityQuestionRelateToOneForCreateInput
+  user: UserRelateToOneForCreateInput
+}
+
+input SecurityQuestionRelateToOneForCreateInput {
+  create: SecurityQuestionCreateInput
+  connect: SecurityQuestionWhereUniqueInput
+}
+
+input UserRelateToOneForCreateInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
 }
 
 type Video {
@@ -524,6 +652,18 @@ type Mutation {
   updateUsers(data: [UserUpdateArgs!]!): [User]
   deleteUser(where: UserWhereUniqueInput!): User
   deleteUsers(where: [UserWhereUniqueInput!]!): [User]
+  createSecurityQuestion(data: SecurityQuestionCreateInput!): SecurityQuestion
+  createSecurityQuestions(data: [SecurityQuestionCreateInput!]!): [SecurityQuestion]
+  updateSecurityQuestion(where: SecurityQuestionWhereUniqueInput!, data: SecurityQuestionUpdateInput!): SecurityQuestion
+  updateSecurityQuestions(data: [SecurityQuestionUpdateArgs!]!): [SecurityQuestion]
+  deleteSecurityQuestion(where: SecurityQuestionWhereUniqueInput!): SecurityQuestion
+  deleteSecurityQuestions(where: [SecurityQuestionWhereUniqueInput!]!): [SecurityQuestion]
+  createSecurityAnswer(data: SecurityAnswerCreateInput!): SecurityAnswer
+  createSecurityAnswers(data: [SecurityAnswerCreateInput!]!): [SecurityAnswer]
+  updateSecurityAnswer(where: SecurityAnswerWhereUniqueInput!, data: SecurityAnswerUpdateInput!): SecurityAnswer
+  updateSecurityAnswers(data: [SecurityAnswerUpdateArgs!]!): [SecurityAnswer]
+  deleteSecurityAnswer(where: SecurityAnswerWhereUniqueInput!): SecurityAnswer
+  deleteSecurityAnswers(where: [SecurityAnswerWhereUniqueInput!]!): [SecurityAnswer]
   createVideo(data: VideoCreateInput!): Video
   createVideos(data: [VideoCreateInput!]!): [Video]
   updateVideo(where: VideoWhereUniqueInput!, data: VideoUpdateInput!): Video
@@ -576,6 +716,12 @@ type Query {
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput! = {}, orderBy: [UserOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: UserWhereUniqueInput): [User!]
   usersCount(where: UserWhereInput! = {}): Int
+  securityQuestion(where: SecurityQuestionWhereUniqueInput!): SecurityQuestion
+  securityQuestions(where: SecurityQuestionWhereInput! = {}, orderBy: [SecurityQuestionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SecurityQuestionWhereUniqueInput): [SecurityQuestion!]
+  securityQuestionsCount(where: SecurityQuestionWhereInput! = {}): Int
+  securityAnswer(where: SecurityAnswerWhereUniqueInput!): SecurityAnswer
+  securityAnswers(where: SecurityAnswerWhereInput! = {}, orderBy: [SecurityAnswerOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SecurityAnswerWhereUniqueInput): [SecurityAnswer!]
+  securityAnswersCount(where: SecurityAnswerWhereInput! = {}): Int
   video(where: VideoWhereUniqueInput!): Video
   videos(where: VideoWhereInput! = {}, orderBy: [VideoOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: VideoWhereUniqueInput): [Video!]
   videosCount(where: VideoWhereInput! = {}): Int
