@@ -68,6 +68,8 @@ export const lists = {
     fields: {
       question: text({ validation: { isRequired: true } }),
       answer: relationship({ ref: 'SecurityAnswer', many: true, }),
+      createdAt: timestamp({ defaultValue: { kind: 'now' }, ui: { itemView: { fieldMode: 'read' } } }),
+      updatedAt: timestamp({ db: { updatedAt: true }, ui: { itemView: { fieldMode: 'read' } } }),
     },
   }),
   SecurityAnswer: list({
@@ -83,6 +85,8 @@ export const lists = {
       answer: text({ validation: { isRequired: true } }),
       question: relationship({ ref: 'SecurityQuestion', many: false, }),
       user: relationship({ ref: 'User', many: false, }),
+      createdAt: timestamp({ defaultValue: { kind: 'now' }, ui: { itemView: { fieldMode: 'read' } } }),
+      updatedAt: timestamp({ db: { updatedAt: true }, ui: { itemView: { fieldMode: 'read' } } }),
     },
   }),
   Video,

@@ -27,6 +27,8 @@ model SecurityQuestion {
   id                           String           @id @default(cuid())
   question                     String           @default("")
   answer                       SecurityAnswer[] @relation("SecurityQuestion_answer")
+  createdAt                    DateTime?        @default(now())
+  updatedAt                    DateTime?        @updatedAt
   from_SecurityAnswer_question SecurityAnswer[] @relation("SecurityAnswer_question")
 }
 
@@ -37,6 +39,8 @@ model SecurityAnswer {
   questionId                   String?            @map("question")
   user                         User?              @relation("SecurityAnswer_user", fields: [userId], references: [id])
   userId                       String?            @map("user")
+  createdAt                    DateTime?          @default(now())
+  updatedAt                    DateTime?          @updatedAt
   from_User_answer             User[]             @relation("User_answer")
   from_SecurityQuestion_answer SecurityQuestion[] @relation("SecurityQuestion_answer")
 

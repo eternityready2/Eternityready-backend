@@ -163,6 +163,8 @@ type SecurityQuestion {
   question: String
   answer(where: SecurityAnswerWhereInput! = {}, orderBy: [SecurityAnswerOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SecurityAnswerWhereUniqueInput): [SecurityAnswer!]
   answerCount(where: SecurityAnswerWhereInput! = {}): Int
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 input SecurityQuestionWhereUniqueInput {
@@ -176,16 +178,22 @@ input SecurityQuestionWhereInput {
   id: IDFilter
   question: StringFilter
   answer: SecurityAnswerManyRelationFilter
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
 }
 
 input SecurityQuestionOrderByInput {
   id: OrderDirection
   question: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
 }
 
 input SecurityQuestionUpdateInput {
   question: String
   answer: SecurityAnswerRelateToManyForUpdateInput
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 input SecurityQuestionUpdateArgs {
@@ -196,6 +204,8 @@ input SecurityQuestionUpdateArgs {
 input SecurityQuestionCreateInput {
   question: String
   answer: SecurityAnswerRelateToManyForCreateInput
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 type SecurityAnswer {
@@ -203,6 +213,8 @@ type SecurityAnswer {
   answer: String
   question: SecurityQuestion
   user: User
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 input SecurityAnswerWhereUniqueInput {
@@ -217,17 +229,23 @@ input SecurityAnswerWhereInput {
   answer: StringFilter
   question: SecurityQuestionWhereInput
   user: UserWhereInput
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
 }
 
 input SecurityAnswerOrderByInput {
   id: OrderDirection
   answer: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
 }
 
 input SecurityAnswerUpdateInput {
   answer: String
   question: SecurityQuestionRelateToOneForUpdateInput
   user: UserRelateToOneForUpdateInput
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 input SecurityQuestionRelateToOneForUpdateInput {
@@ -251,6 +269,8 @@ input SecurityAnswerCreateInput {
   answer: String
   question: SecurityQuestionRelateToOneForCreateInput
   user: UserRelateToOneForCreateInput
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 input SecurityQuestionRelateToOneForCreateInput {
