@@ -20,6 +20,7 @@ import {
 import { categoryHandler } from "./api/categories";
 import { postSearchHandler } from "./api/instagram";
 import { verifyVideosHandler } from "./api/sync";
+import { passwordResetHandler } from "./api/passwordReset";
 
 dotenvConfig();
 const allowedOrigins = process.env.ALLOWED_ORIGINS
@@ -158,6 +159,10 @@ export default withAuth(
 
         app.get("/api/highlight", async (req: Request, res: Response) => {
           await featuredVideosHandler(req, res, context);
+        });
+
+        app.post("/api/password-reset", async (req: Request, res: Response) => {
+          await passwordResetHandler(req, res, context);
         });
       },
     },

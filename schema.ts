@@ -25,8 +25,8 @@ export const lists = {
       operation: {
         query: allowAll,
         create: allowAll,
-        update: isAdmin,
-        delete: isAdmin,
+        update: allowAll,
+        delete: allowAll,
       },
     },
     fields: {
@@ -61,8 +61,8 @@ export const lists = {
       operation: {
         query: allowAll,
         create: allowAll,
-        update: isAdmin,
-        delete: isAdmin,
+        update: allowAll,
+        delete: allowAll,
       },
     },
     fields: {
@@ -77,8 +77,8 @@ export const lists = {
       operation: {
         query: allowAll,
         create: allowAll,
-        update: isAdmin,
-        delete: isAdmin,
+        update: allowAll,
+        delete: allowAll,
       },
     },
     fields: {
