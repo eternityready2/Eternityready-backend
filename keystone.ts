@@ -115,7 +115,7 @@ export default withAuth(
             // },
             origin: "*", // Only for developing
             methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            allowedHeaders: ["Content-Type", "Authorization"],
+            allowedHeaders: ["Content-Type", "Authorization", "x-apollo-operation-name"],
             credentials: true,
           })
         );
