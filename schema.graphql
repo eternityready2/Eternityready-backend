@@ -11,6 +11,7 @@ type User {
   password: PasswordState
   createdAt: DateTime
   privilege: String
+  profileImage: ImageFieldOutput
 }
 
 type PasswordState {
@@ -18,6 +19,22 @@ type PasswordState {
 }
 
 scalar DateTime @specifiedBy(url: "https://datatracker.ietf.org/doc/html/rfc3339#section-5.6")
+
+type ImageFieldOutput {
+  id: ID!
+  filesize: Int!
+  width: Int!
+  height: Int!
+  extension: ImageExtension!
+  url: String!
+}
+
+enum ImageExtension {
+  jpg
+  png
+  webp
+  gif
+}
 
 input UserWhereUniqueInput {
   id: ID
@@ -129,6 +146,7 @@ input UserUpdateInput {
   password: String
   createdAt: DateTime
   privilege: String
+  profileImage: ImageFieldInput
 }
 
 input SecurityAnswerRelateToManyForUpdateInput {
@@ -137,6 +155,13 @@ input SecurityAnswerRelateToManyForUpdateInput {
   create: [SecurityAnswerCreateInput!]
   connect: [SecurityAnswerWhereUniqueInput!]
 }
+
+input ImageFieldInput {
+  upload: Upload!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 input UserUpdateArgs {
   where: UserWhereUniqueInput!
@@ -151,6 +176,7 @@ input UserCreateInput {
   password: String
   createdAt: DateTime
   privilege: String
+  profileImage: ImageFieldInput
 }
 
 input SecurityAnswerRelateToManyForCreateInput {
@@ -313,22 +339,6 @@ type FileFieldOutput {
   url: String!
 }
 
-type ImageFieldOutput {
-  id: ID!
-  filesize: Int!
-  width: Int!
-  height: Int!
-  extension: ImageExtension!
-  url: String!
-}
-
-enum ImageExtension {
-  jpg
-  png
-  webp
-  gif
-}
-
 input VideoWhereUniqueInput {
   id: ID
   videoId: String
@@ -412,13 +422,6 @@ input VideoUpdateInput {
 }
 
 input FileFieldInput {
-  upload: Upload!
-}
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
-
-input ImageFieldInput {
   upload: Upload!
 }
 

@@ -1,25 +1,31 @@
-import { type Lists } from ".keystone/types";
+import { type Lists, Session } from ".keystone/types";
 
-import { User } from "./schemas/user";
 import { Video } from "./schemas/video";
 import { Ad } from "./schemas/ad";
 import { Category } from "./schemas/category";
-import { list } from "@keystone-6/core";
 import { Instagram } from "./schemas/instagram";
-import { relationship, text, password, timestamp, select } from "@keystone-6/core/fields";
+import { list } from "@keystone-6/core";
+import {
+  relationship,
+  text,
+  password,
+  timestamp,
+  select,
+  image,
+} from "@keystone-6/core/fields";
 import { allowAll } from "@keystone-6/core/access";
 
 const isAdmin = ({ session }: { session?: Session }) => {
   console.log(session);
-  return Boolean(session?.data.privilege == "admin");
-}
+  return Boolean(session?.data.privilege === "admin");
+};
 
 const isDonator = ({ session }: { session?: Session }) => {
   console.log(session);
-  return Boolean(session?.data.privilege == "donator");
-}
+  return Boolean(session?.data.privilege === "donator");
+};
 
-export const lists = {
+export const lists: Lists = {
   User: list({
     access: {
       operation: {
@@ -30,7 +36,7 @@ export const lists = {
       },
     },
     fields: {
-      answer: relationship({ ref: 'SecurityAnswer', many: true, }),
+      answer: relationship({ ref: "SecurityAnswer", many: true }),
       firstName: text({ validation: { isRequired: true } }),
       lastName: text({ validation: { isRequired: true } }),
       email: text({ validation: { isRequired: true }, isIndexed: "unique" }),
@@ -40,20 +46,21 @@ export const lists = {
       }),
       privilege: select({
         options: [
-          { label: 'Admin', value: 'admin' },
-          { label: 'Donator', value: 'donator' },
-          { label: 'Normal', value: 'normal' },
+          { label: "Admin", value: "admin" },
+          { label: "Donator", value: "donator" },
+          { label: "Normal", value: "normal" },
         ],
         defaultValue: "normal",
         access: {
-          create: ({ session, context, listKey, fieldKey, operation, inputData }) => {
-            if (!isAdmin(session) && Boolean(inputData?.privilege != "normal")) {
+          create: ({ session, inputData }) => {
+            if (!isAdmin(session) && Boolean(inputData?.privilege !== "normal")) {
               return false;
             }
             return true;
           },
-        }
+        },
       }),
+      profileImage: image({ storage: "profile_images" }),
     },
   }),
   SecurityQuestion: list({
@@ -67,9 +74,15 @@ export const lists = {
     },
     fields: {
       question: text({ validation: { isRequired: true } }),
-      answer: relationship({ ref: 'SecurityAnswer', many: true, }),
-      createdAt: timestamp({ defaultValue: { kind: 'now' }, ui: { itemView: { fieldMode: 'read' } } }),
-      updatedAt: timestamp({ db: { updatedAt: true }, ui: { itemView: { fieldMode: 'read' } } }),
+      answer: relationship({ ref: "SecurityAnswer", many: true }),
+      createdAt: timestamp({
+        defaultValue: { kind: "now" },
+        ui: { itemView: { fieldMode: "read" } },
+      }),
+      updatedAt: timestamp({
+        db: { updatedAt: true },
+        ui: { itemView: { fieldMode: "read" } },
+      }),
     },
   }),
   SecurityAnswer: list({
@@ -83,10 +96,16 @@ export const lists = {
     },
     fields: {
       answer: text({ validation: { isRequired: true } }),
-      question: relationship({ ref: 'SecurityQuestion', many: false, }),
-      user: relationship({ ref: 'User', many: false, }),
-      createdAt: timestamp({ defaultValue: { kind: 'now' }, ui: { itemView: { fieldMode: 'read' } } }),
-      updatedAt: timestamp({ db: { updatedAt: true }, ui: { itemView: { fieldMode: 'read' } } }),
+      question: relationship({ ref: "SecurityQuestion", many: false }),
+      user: relationship({ ref: "User", many: false }),
+      createdAt: timestamp({
+        defaultValue: { kind: "now" },
+        ui: { itemView: { fieldMode: "read" } },
+      }),
+      updatedAt: timestamp({
+        db: { updatedAt: true },
+        ui: { itemView: { fieldMode: "read" } },
+      }),
     },
   }),
   Video,

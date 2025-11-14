@@ -20,6 +20,11 @@ model User {
   password                 String
   createdAt                DateTime?        @default(now())
   privilege                String?          @default("normal")
+  profileImage_id          String?
+  profileImage_filesize    Int?
+  profileImage_width       Int?
+  profileImage_height      Int?
+  profileImage_extension   String?
   from_SecurityAnswer_user SecurityAnswer[] @relation("SecurityAnswer_user")
 }
 

@@ -90,6 +90,15 @@ export default withAuth(
         },
         storagePath: "public/ads",
       },
+      profile_images: {
+        kind: "local",
+        type: "image",
+        generateUrl: (path) => `/profile_images/${path}`,
+        serverRoute: {
+          path: "/profile_images",
+        },
+        storagePath: "public/profile_images",
+      }
     },
 
     server: {
