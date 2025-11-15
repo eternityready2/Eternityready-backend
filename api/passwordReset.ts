@@ -43,13 +43,17 @@ export const passwordResetHandler = async (
       });
     }
 
-    const user = await context.db.User.findOne({ where: { email } });
+    const user = await context.sudo().db.User.findOne({
+      where: { email },
+      query: 'id email',
+    });
+    console.log(email);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     for (const { questionId, answer } of security) {
-      const secAnswers = await context.db.SecurityAnswer.findMany({
+      const secAnswers = await context.sudo().db.SecurityAnswer.findMany({
         where: {
           user: { id: { equals: user.id } },
           question: { id: { equals: questionId } }
@@ -62,7 +66,7 @@ export const passwordResetHandler = async (
       }
     }
 
-    await context.db.User.updateOne({
+    await context.sudo().db.User.updateOne({
       where: { id: user.id },
       data: { password: newPassword }
     });
