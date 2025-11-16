@@ -44,7 +44,8 @@ export default withAuth(
     },
     ui: {
       isAccessAllowed: async (context) => {
-        const users = await context.db.User.count();
+        const users = await context.sudo().db.User.count();
+        console.log(users);
         if (users === 0) {
           return true;
         } // Libera acesso à tela de criação do primeiro user

@@ -29,6 +29,8 @@ const { withAuth } = createAuth({
 
   initFirstItem: {
     fields: ["firstName", "lastName", "email", "password", "privilege"],
+    itemData: { privilege: 'admin' },
+    skipKeystoneWelcome: false,
   },
 });
 
