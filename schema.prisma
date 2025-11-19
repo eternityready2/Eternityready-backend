@@ -84,14 +84,24 @@ model Video {
 model Ad {
   id              String  @id @default(cuid())
   title           String  @default("")
-  location        String?
+  description     String  @default("")
+  mode            String? @default("imageLink")
   image_id        String?
   image_filesize  Int?
   image_width     Int?
   image_height    Int?
   image_extension String?
   link            String  @default("")
-  isActive        Boolean @default(true)
+  html            String  @default("") @mysql.Text
+  location        String? @default("header")
+  top             String  @default("")
+  bottom          String  @default("")
+  left            String  @default("")
+  right           String  @default("")
+  dimensions      String? @default("leaderboard")
+  width           String  @default("")
+  height          String  @default("")
+  status          String? @default("disable")
 }
 
 model Category {

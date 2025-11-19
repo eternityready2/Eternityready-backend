@@ -467,10 +467,20 @@ input CategoryRelateToManyForCreateInput {
 type Ad {
   id: ID!
   title: String
-  location: String
+  description: String
+  mode: String
   image: ImageFieldOutput
   link: String
-  isActive: Boolean
+  html: String
+  location: String
+  top: String
+  bottom: String
+  left: String
+  right: String
+  dimensions: String
+  width: String
+  height: String
+  status: String
 }
 
 input AdWhereUniqueInput {
@@ -483,25 +493,55 @@ input AdWhereInput {
   NOT: [AdWhereInput!]
   id: IDFilter
   title: StringFilter
-  location: StringNullableFilter
+  description: StringFilter
+  mode: StringNullableFilter
   link: StringFilter
-  isActive: BooleanFilter
+  html: StringFilter
+  location: StringNullableFilter
+  top: StringFilter
+  bottom: StringFilter
+  left: StringFilter
+  right: StringFilter
+  dimensions: StringNullableFilter
+  width: StringFilter
+  height: StringFilter
+  status: StringNullableFilter
 }
 
 input AdOrderByInput {
   id: OrderDirection
   title: OrderDirection
-  location: OrderDirection
+  description: OrderDirection
+  mode: OrderDirection
   link: OrderDirection
-  isActive: OrderDirection
+  html: OrderDirection
+  location: OrderDirection
+  top: OrderDirection
+  bottom: OrderDirection
+  left: OrderDirection
+  right: OrderDirection
+  dimensions: OrderDirection
+  width: OrderDirection
+  height: OrderDirection
+  status: OrderDirection
 }
 
 input AdUpdateInput {
   title: String
-  location: String
+  description: String
+  mode: String
   image: ImageFieldInput
   link: String
-  isActive: Boolean
+  html: String
+  location: String
+  top: String
+  bottom: String
+  left: String
+  right: String
+  dimensions: String
+  width: String
+  height: String
+  status: String
 }
 
 input AdUpdateArgs {
@@ -511,10 +551,20 @@ input AdUpdateArgs {
 
 input AdCreateInput {
   title: String
-  location: String
+  description: String
+  mode: String
   image: ImageFieldInput
   link: String
-  isActive: Boolean
+  html: String
+  location: String
+  top: String
+  bottom: String
+  left: String
+  right: String
+  dimensions: String
+  width: String
+  height: String
+  status: String
 }
 
 type Category {
