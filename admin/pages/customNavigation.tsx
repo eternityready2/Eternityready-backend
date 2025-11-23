@@ -25,6 +25,7 @@ export default function CustomNavigation({
         }}
       />
       <NavItem href="/customListView">Videos</NavItem>
+      <NavItem href="/adStats">Ad Stats</NavItem>
       <ListNavItems lists={allowedLists} />
     </NavigationContainer>
   );
