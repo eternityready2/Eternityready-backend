@@ -159,26 +159,24 @@ export const Ad = list({
           resolvedData.bottom = "";
           break;
       }
-
+      
       switch (resolvedData.dimensions) {
-        case "leaderboard":
-          resolvedData.width = "728px";
-          resolvedData.height = "90px";
+        case 'leaderboard':
+          resolvedData.width = '728px';
+          resolvedData.height = '90px';
           break;
-
-        case "skyscraper":
-          resolvedData.width = "160px";
-          resolvedData.height = "600px";
+        case 'skyscraper':
+          resolvedData.width = '160px';
+          resolvedData.height = '600px';
           break;
-
-        case "popup":
-          resolvedData.width = "250px";
-          resolvedData.height = "250px";
+        case 'popup':
+          resolvedData.width = '250px';
+          resolvedData.height = '250px';
           break;
-
-        default:
-          resolvedData.width = "128px";
-          resolvedData.height = "128px";
+        case 'custom':
+          resolvedData.width = resolvedData.width ?? existingItem?.width ?? '128px';
+          resolvedData.height = resolvedData.height ?? existingItem?.height ?? '128px';
+          break;
       }
       return resolvedData;
     }
