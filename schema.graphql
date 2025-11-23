@@ -481,6 +481,8 @@ type Ad {
   width: String
   height: String
   status: String
+  stats(where: AdStatWhereInput! = {}, orderBy: [AdStatOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: AdStatWhereUniqueInput): [AdStat!]
+  statsCount(where: AdStatWhereInput! = {}): Int
 }
 
 input AdWhereUniqueInput {
@@ -506,6 +508,13 @@ input AdWhereInput {
   width: StringFilter
   height: StringFilter
   status: StringNullableFilter
+  stats: AdStatManyRelationFilter
+}
+
+input AdStatManyRelationFilter {
+  every: AdStatWhereInput
+  some: AdStatWhereInput
+  none: AdStatWhereInput
 }
 
 input AdOrderByInput {
@@ -542,6 +551,14 @@ input AdUpdateInput {
   width: String
   height: String
   status: String
+  stats: AdStatRelateToManyForUpdateInput
+}
+
+input AdStatRelateToManyForUpdateInput {
+  disconnect: [AdStatWhereUniqueInput!]
+  set: [AdStatWhereUniqueInput!]
+  create: [AdStatCreateInput!]
+  connect: [AdStatWhereUniqueInput!]
 }
 
 input AdUpdateArgs {
@@ -565,6 +582,78 @@ input AdCreateInput {
   width: String
   height: String
   status: String
+  stats: AdStatRelateToManyForCreateInput
+}
+
+input AdStatRelateToManyForCreateInput {
+  create: [AdStatCreateInput!]
+  connect: [AdStatWhereUniqueInput!]
+}
+
+type AdStat {
+  id: ID!
+  eventType: String
+  timestamp: DateTime
+  ad: Ad
+}
+
+input AdStatWhereUniqueInput {
+  id: ID
+}
+
+input AdStatWhereInput {
+  AND: [AdStatWhereInput!]
+  OR: [AdStatWhereInput!]
+  NOT: [AdStatWhereInput!]
+  id: IDFilter
+  eventType: StringFilter
+  timestamp: DateTimeFilter
+  ad: AdWhereInput
+}
+
+input DateTimeFilter {
+  equals: DateTime
+  in: [DateTime!]
+  notIn: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  gt: DateTime
+  gte: DateTime
+  not: DateTimeFilter
+}
+
+input AdStatOrderByInput {
+  id: OrderDirection
+  eventType: OrderDirection
+  timestamp: OrderDirection
+}
+
+input AdStatUpdateInput {
+  eventType: String
+  timestamp: DateTime
+  ad: AdRelateToOneForUpdateInput
+}
+
+input AdRelateToOneForUpdateInput {
+  create: AdCreateInput
+  connect: AdWhereUniqueInput
+  disconnect: Boolean
+}
+
+input AdStatUpdateArgs {
+  where: AdStatWhereUniqueInput!
+  data: AdStatUpdateInput!
+}
+
+input AdStatCreateInput {
+  eventType: String
+  timestamp: DateTime
+  ad: AdRelateToOneForCreateInput
+}
+
+input AdRelateToOneForCreateInput {
+  create: AdCreateInput
+  connect: AdWhereUniqueInput
 }
 
 type Category {
@@ -749,6 +838,12 @@ type Mutation {
   updateAds(data: [AdUpdateArgs!]!): [Ad]
   deleteAd(where: AdWhereUniqueInput!): Ad
   deleteAds(where: [AdWhereUniqueInput!]!): [Ad]
+  createAdStat(data: AdStatCreateInput!): AdStat
+  createAdStats(data: [AdStatCreateInput!]!): [AdStat]
+  updateAdStat(where: AdStatWhereUniqueInput!, data: AdStatUpdateInput!): AdStat
+  updateAdStats(data: [AdStatUpdateArgs!]!): [AdStat]
+  deleteAdStat(where: AdStatWhereUniqueInput!): AdStat
+  deleteAdStats(where: [AdStatWhereUniqueInput!]!): [AdStat]
   createCategory(data: CategoryCreateInput!): Category
   createCategories(data: [CategoryCreateInput!]!): [Category]
   updateCategory(where: CategoryWhereUniqueInput!, data: CategoryUpdateInput!): Category
@@ -801,6 +896,9 @@ type Query {
   ad(where: AdWhereUniqueInput!): Ad
   ads(where: AdWhereInput! = {}, orderBy: [AdOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: AdWhereUniqueInput): [Ad!]
   adsCount(where: AdWhereInput! = {}): Int
+  adStat(where: AdStatWhereUniqueInput!): AdStat
+  adStats(where: AdStatWhereInput! = {}, orderBy: [AdStatOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: AdStatWhereUniqueInput): [AdStat!]
+  adStatsCount(where: AdStatWhereInput! = {}): Int
   category(where: CategoryWhereUniqueInput!): Category
   categories(where: CategoryWhereInput! = {}, orderBy: [CategoryOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CategoryWhereUniqueInput): [Category!]
   categoriesCount(where: CategoryWhereInput! = {}): Int

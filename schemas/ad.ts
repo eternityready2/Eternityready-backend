@@ -3,10 +3,30 @@ import {
   text,
   select,
   image,
-  json
+  json,
+  timestamp,
+  relationship
 } from '@keystone-6/core/fields';
 
 import { allowAll } from "@keystone-6/core/access";
+
+export const AdStat = list({
+  access: allowAll,
+  fields: {
+    eventType: select({
+      options: [
+        { label: "Impression", value: "impression" },
+        { label: "Click", value: "click" }
+      ],
+      validation: { isRequired: true }
+    }),
+    timestamp: timestamp({
+      defaultValue: { kind: 'now' },
+      validation: { isRequired: true }
+    }),
+    ad: relationship({ ref: 'Ad.stats', many: false })
+  }
+});
 
 export const Ad = list({
   access: allowAll,
@@ -75,6 +95,7 @@ export const Ad = list({
       defaultValue: "disable",
       ui: { displayMode: 'segmented-control' }
     }),
+    stats: relationship({ ref: 'AdStat.ad', many: true }),
   },
   ui: {
     itemView: {

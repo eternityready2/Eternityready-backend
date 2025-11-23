@@ -1,7 +1,7 @@
 import { type Lists, Session } from ".keystone/types";
 
 import { Video } from "./schemas/video";
-import { Ad } from "./schemas/ad";
+import { Ad, AdStat } from "./schemas/ad";
 import { Category } from "./schemas/category";
 import { Instagram } from "./schemas/instagram";
 import { list } from "@keystone-6/core";
@@ -126,6 +126,7 @@ export const lists = {
   }),
   Video,
   Ad,
+  AdStat,
   Category,
   Instagram,
 } satisfies Lists;
