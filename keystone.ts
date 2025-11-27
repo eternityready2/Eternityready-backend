@@ -21,6 +21,9 @@ import { categoryHandler } from "./api/categories";
 import { postSearchHandler } from "./api/instagram";
 import { verifyVideosHandler } from "./api/sync";
 import { passwordResetHandler } from "./api/passwordReset";
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {});
 
 dotenvConfig();
 const allowedOrigins = process.env.ALLOWED_ORIGINS
@@ -173,6 +176,39 @@ export default withAuth(
 
         app.post("/api/password-reset", async (req: Request, res: Response) => {
           await passwordResetHandler(req, res, context);
+        });
+
+        app.post('/api/create-checkout-session', async (req, res) => {
+          try {
+            /*
+              const session = req.session;
+              if (!session || !session.itemId) {
+                return res.status(401).json({ error: 'Not authenticated' });
+              }
+            */
+
+              const checkoutSession = await stripe.checkout.sessions.create({
+                mode: 'payment',
+                line_items: [
+                  {
+                    price: 'price_1SXrzvH41rsd1BFLGY1jnkwj',
+                    quantity: 1,
+                  },
+                ],
+                success_url: `${process.env.ETERNITY_BASE_URL}/login?session_id={CHECKOUT_SESSION_ID}`,
+                metadata: {
+                  keystoneUserId: session.itemId,
+                },
+              });
+
+              res.json({ url: checkoutSession.url });
+            }
+            catch (err) {
+              console.error(err);
+              res.status(500).json({
+                error: 'Unable to create checkout session'
+              });
+            }
         });
       },
     },
