@@ -37,7 +37,7 @@ export default withAuth(
       url: process.env.DATABASE_URL!,
       onConnect: async (context) => {
         try {
-          if ((await context.db.User.count()) === 0) {
+          if ((await context.sudo().db.User.count()) === 0) {
             console.log("No users found. Create the first one at Admin UI");
           }
         } catch (err) {
@@ -179,36 +179,110 @@ export default withAuth(
         });
 
         app.post('/api/create-checkout-session', async (req, res) => {
-          try {
-            /*
-              const session = req.session;
-              if (!session || !session.itemId) {
-                return res.status(401).json({ error: 'Not authenticated' });
-              }
-            */
+          const session = req.session;
 
-              const checkoutSession = await stripe.checkout.sessions.create({
-                mode: 'payment',
-                line_items: [
-                  {
-                    price: 'price_1SXrzvH41rsd1BFLGY1jnkwj',
-                    quantity: 1,
-                  },
-                ],
-                success_url: `${process.env.ETERNITY_BASE_URL}/login?session_id={CHECKOUT_SESSION_ID}`,
-                metadata: {
-                  keystoneUserId: session.itemId,
+          if (!session?.itemId) {
+            return res.status(401).json({ error: 'Not authenticated' });
+          }
+
+          const userId = session.itemId;
+
+          const user = await context.sudo().db.User.findOne({ where: { id: userId } });
+
+          let stripeCustomerId = user.stripeCustomerId;
+          if (!stripeCustomerId) {
+            const customer = await stripe.customers.create({
+              email: user.email,
+              metadata: { keystoneUserId: userId },
+            });
+            stripeCustomerId = customer.id;
+            await context.sudo().db.User.update({
+              where: { id: userId },
+              data: { stripeCustomerId },
+            });
+          }
+
+          const sessionCheckout = await stripe.checkout.sessions.create({
+            mode: 'subscription',
+            customer: stripeCustomerId,
+            line_items: [
+              {
+                price: 'price_1SXrzvH41rsd1BFLGY1jnkwj',
+                quantity: 1,
+              },
+            ],
+            success_url: `${process.env.ETERNITY_BASE_URL}/login?session_id={CHECKOUT_SESSION_ID}`,
+            metadata: {
+              keystoneUserId: userId,
+            },
+          });
+
+          res.json({ url: sessionCheckout.url });
+        });
+
+        app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+          const sig = req.headers['stripe-signature'];
+          let event;
+
+          try {
+            event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+          } catch (err) {
+            return res.status(400).send(`Webhook Error`);
+          }
+
+          switch (event.type) {
+            case 'customer.subscription.created':
+            case 'customer.subscription.updated': {
+              const subscription = event.data.object as Stripe.Subscription;
+              const customerId = subscription.customer as string;
+              const status = subscription.status;
+
+              const user = await context.sudo().db.User.findOne({
+                where: { stripeCustomerId: customerId },
+              });
+
+              if (!user) break;
+
+              const privilege = (status === 'active' || status === 'trialing') ? 'donator' : 'normal';
+
+              await context.sudo().db.User.update({
+                where: { id: user.id },
+                data: {
+                  privilege,
+                  stripeSubscriptionId: subscription.id,
+                  stripeStatus: status,
                 },
               });
 
-              res.json({ url: checkoutSession.url });
+              break;
             }
-            catch (err) {
-              console.error(err);
-              res.status(500).json({
-                error: 'Unable to create checkout session'
+            case 'customer.subscription.deleted':
+            case 'customer.subscription.canceled': {
+              const subscription = event.data.object as Stripe.Subscription;
+              const customerId = subscription.customer as string;
+
+              const user = await context.sudo().db.User.findOne({
+                where: { stripeCustomerId: customerId },
               });
+
+              if (!user) break;
+
+              await context.sudo().db.User.update({
+                where: { id: user.id },
+                data: {
+                  privilege: 'normal',
+                  stripeSubscriptionId: null,
+                  stripeStatus: subscription.status,
+                },
+              });
+
+              break;
             }
+            default:
+              break;
+          }
+
+          res.json({ received: true });
         });
       },
     },
