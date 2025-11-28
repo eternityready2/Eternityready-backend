@@ -78,6 +78,16 @@ export const lists = {
         },
       }),
       profileImage: image({ storage: 'profile_images' }),
+      stripeCustomerId: text({
+        isIndexed: 'unique',
+        db: { isNullable: true },
+      }),
+      stripeSubscriptionId: text({
+        db: { isNullable: true },
+      }),
+      stripeStatus: text({
+        db: { isNullable: true },
+      }),
     },
   }),
 

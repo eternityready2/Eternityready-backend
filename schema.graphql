@@ -12,6 +12,9 @@ type User {
   createdAt: DateTime
   privilege: String
   profileImage: ImageFieldOutput
+  stripeCustomerId: String
+  stripeSubscriptionId: String
+  stripeStatus: String
 }
 
 type PasswordState {
@@ -39,6 +42,7 @@ enum ImageExtension {
 input UserWhereUniqueInput {
   id: ID
   email: String
+  stripeCustomerId: String
 }
 
 input UserWhereInput {
@@ -52,6 +56,9 @@ input UserWhereInput {
   email: StringFilter
   createdAt: DateTimeNullableFilter
   privilege: StringNullableFilter
+  stripeCustomerId: StringNullableFilter
+  stripeSubscriptionId: StringNullableFilter
+  stripeStatus: StringNullableFilter
 }
 
 input IDFilter {
@@ -131,6 +138,9 @@ input UserOrderByInput {
   email: OrderDirection
   createdAt: OrderDirection
   privilege: OrderDirection
+  stripeCustomerId: OrderDirection
+  stripeSubscriptionId: OrderDirection
+  stripeStatus: OrderDirection
 }
 
 enum OrderDirection {
@@ -147,6 +157,9 @@ input UserUpdateInput {
   createdAt: DateTime
   privilege: String
   profileImage: ImageFieldInput
+  stripeCustomerId: String
+  stripeSubscriptionId: String
+  stripeStatus: String
 }
 
 input SecurityAnswerRelateToManyForUpdateInput {
@@ -177,6 +190,9 @@ input UserCreateInput {
   createdAt: DateTime
   privilege: String
   profileImage: ImageFieldInput
+  stripeCustomerId: String
+  stripeSubscriptionId: String
+  stripeStatus: String
 }
 
 input SecurityAnswerRelateToManyForCreateInput {

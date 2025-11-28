@@ -148,6 +148,73 @@ export default withAuth(
           })
         );
 
+        app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+          const sig = req.headers['stripe-signature'];
+          let event;
+
+          try {
+            event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+          } catch (err) {
+            return res.status(400).send(`Webhook Error`);
+          }
+
+          switch (event.type) {
+            case 'customer.subscription.created':
+            case 'customer.subscription.updated': {
+              const subscription = event.data.object as Stripe.Subscription;
+              const customerId = subscription.customer as string;
+              const status = subscription.status;
+
+              console.log(customerId);
+
+              const user = await context.sudo().db.User.findOne({
+                where: { stripeCustomerId: customerId },
+              });
+
+              if (!user) break;
+
+              const privilege = (status === 'active' || status === 'trialing') ? 'donator' : 'normal';
+
+              await context.sudo().db.User.updateOne({
+                where: { id: user.id },
+                data: {
+                  privilege,
+                  stripeSubscriptionId: subscription.id,
+                  stripeStatus: status,
+                },
+              });
+
+              break;
+            }
+            case 'customer.subscription.deleted':
+            case 'customer.subscription.canceled': {
+              const subscription = event.data.object as Stripe.Subscription;
+              const customerId = subscription.customer as string;
+
+              const user = await context.sudo().db.User.findOne({
+                where: { stripeCustomerId: customerId },
+              });
+
+              if (!user) break;
+
+              await context.sudo().db.User.updateOne({
+                where: { id: user.id },
+                data: {
+                  privilege: 'normal',
+                  stripeSubscriptionId: null,
+                  stripeStatus: subscription.status,
+                },
+              });
+
+              break;
+            }
+            default:
+              break;
+          }
+
+          res.json({ received: true });
+        });
+
         app.use(express.json());
 
         app.get("/api/search", async (req: Request, res: Response) => {
@@ -179,7 +246,8 @@ export default withAuth(
         });
 
         app.post('/api/create-checkout-session', async (req, res) => {
-          const session = req.session;
+          const requestContext = await context.withRequest(req, res);
+          const session = requestContext.session;
 
           if (!session?.itemId) {
             return res.status(401).json({ error: 'Not authenticated' });
@@ -196,7 +264,7 @@ export default withAuth(
               metadata: { keystoneUserId: userId },
             });
             stripeCustomerId = customer.id;
-            await context.sudo().db.User.update({
+            await context.sudo().db.User.updateOne({
               where: { id: userId },
               data: { stripeCustomerId },
             });
@@ -207,7 +275,7 @@ export default withAuth(
             customer: stripeCustomerId,
             line_items: [
               {
-                price: 'price_1SXrzvH41rsd1BFLGY1jnkwj',
+                price: 'price_1SYXWhH41rsd1BFLnQlxmIdq',
                 quantity: 1,
               },
             ],
@@ -220,69 +288,16 @@ export default withAuth(
           res.json({ url: sessionCheckout.url });
         });
 
-        app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-          const sig = req.headers['stripe-signature'];
-          let event;
+        
+        app.use(async (err: any, req: Request, res: Response, next: any) => {
+          console.error('Global error:', err.message || err);
+          console.error('Stack:', err.stack);
 
-          try {
-            event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-          } catch (err) {
-            return res.status(400).send(`Webhook Error`);
-          }
-
-          switch (event.type) {
-            case 'customer.subscription.created':
-            case 'customer.subscription.updated': {
-              const subscription = event.data.object as Stripe.Subscription;
-              const customerId = subscription.customer as string;
-              const status = subscription.status;
-
-              const user = await context.sudo().db.User.findOne({
-                where: { stripeCustomerId: customerId },
-              });
-
-              if (!user) break;
-
-              const privilege = (status === 'active' || status === 'trialing') ? 'donator' : 'normal';
-
-              await context.sudo().db.User.update({
-                where: { id: user.id },
-                data: {
-                  privilege,
-                  stripeSubscriptionId: subscription.id,
-                  stripeStatus: status,
-                },
-              });
-
-              break;
-            }
-            case 'customer.subscription.deleted':
-            case 'customer.subscription.canceled': {
-              const subscription = event.data.object as Stripe.Subscription;
-              const customerId = subscription.customer as string;
-
-              const user = await context.sudo().db.User.findOne({
-                where: { stripeCustomerId: customerId },
-              });
-
-              if (!user) break;
-
-              await context.sudo().db.User.update({
-                where: { id: user.id },
-                data: {
-                  privilege: 'normal',
-                  stripeSubscriptionId: null,
-                  stripeStatus: subscription.status,
-                },
-              });
-
-              break;
-            }
-            default:
-              break;
-          }
-
-          res.json({ received: true });
+          res.status(err.status || 500).json({
+            error: true,
+            message: err.message || 'Internal Server Error',
+            ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+          });
         });
       },
     },

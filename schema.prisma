@@ -25,6 +25,9 @@ model User {
   profileImage_width       Int?
   profileImage_height      Int?
   profileImage_extension   String?
+  stripeCustomerId         String?          @unique
+  stripeSubscriptionId     String?
+  stripeStatus             String?
   from_SecurityAnswer_user SecurityAnswer[] @relation("SecurityAnswer_user")
 }
 
