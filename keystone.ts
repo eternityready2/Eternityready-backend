@@ -178,7 +178,7 @@ export default withAuth(
               await context.sudo().db.User.updateOne({
                 where: { id: user.id },
                 data: {
-                  privilege,
+                  privilege: user.privilege == "admin" ? user.privilege : privilege,
                   stripeSubscriptionId: subscription.id,
                   stripeStatus: status,
                 },
@@ -200,7 +200,7 @@ export default withAuth(
               await context.sudo().db.User.updateOne({
                 where: { id: user.id },
                 data: {
-                  privilege: 'normal',
+                  privilege: user.privilege == 'admin' ? user.privilege : "normal",
                   stripeSubscriptionId: null,
                   stripeStatus: subscription.status,
                 },
