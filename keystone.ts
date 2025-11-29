@@ -275,7 +275,7 @@ export default withAuth(
             customer: stripeCustomerId,
             line_items: [
               {
-                price: 'price_1SYXWhH41rsd1BFLnQlxmIdq',
+                price: process.env.STRIPE_DONATOR_PRICE,
                 quantity: 1,
               },
             ],
