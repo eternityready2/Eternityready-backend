@@ -279,7 +279,7 @@ export default withAuth(
                 quantity: 1,
               },
             ],
-            success_url: `${process.env.ETERNITY_BASE_URL}/login?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${process.env.ETERNITY_BASE_URL}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
             metadata: {
               keystoneUserId: userId,
             },
