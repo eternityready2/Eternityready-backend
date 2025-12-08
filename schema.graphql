@@ -330,12 +330,14 @@ type Video {
   sourceType: String
   youtubeUrl: String
   embedCode: String
+  thumbnailUrl: String
   uploadedFile: FileFieldOutput
   title: String
   description: String
   thumbnail: ImageFieldOutput
   author: String
   videoId: String
+  mediaId: String
   duration: String
   isNew: Boolean
   createdAt: DateTime
@@ -357,7 +359,7 @@ type FileFieldOutput {
 
 input VideoWhereUniqueInput {
   id: ID
-  videoId: String
+  mediaId: String
 }
 
 input VideoWhereInput {
@@ -366,12 +368,14 @@ input VideoWhereInput {
   NOT: [VideoWhereInput!]
   id: IDFilter
   sourceType: StringNullableFilter
-  youtubeUrl: StringFilter
+  youtubeUrl: StringNullableFilter
   embedCode: StringNullableFilter
+  thumbnailUrl: StringNullableFilter
   title: StringFilter
   description: StringNullableFilter
   author: StringFilter
   videoId: StringFilter
+  mediaId: StringNullableFilter
   duration: StringFilter
   isNew: BooleanFilter
   createdAt: DateTimeNullableFilter
@@ -400,10 +404,12 @@ input VideoOrderByInput {
   sourceType: OrderDirection
   youtubeUrl: OrderDirection
   embedCode: OrderDirection
+  thumbnailUrl: OrderDirection
   title: OrderDirection
   description: OrderDirection
   author: OrderDirection
   videoId: OrderDirection
+  mediaId: OrderDirection
   duration: OrderDirection
   isNew: OrderDirection
   createdAt: OrderDirection
@@ -419,12 +425,14 @@ input VideoUpdateInput {
   sourceType: String
   youtubeUrl: String
   embedCode: String
+  thumbnailUrl: String
   uploadedFile: FileFieldInput
   title: String
   description: String
   thumbnail: ImageFieldInput
   author: String
   videoId: String
+  mediaId: String
   duration: String
   isNew: Boolean
   createdAt: DateTime
@@ -457,12 +465,14 @@ input VideoCreateInput {
   sourceType: String
   youtubeUrl: String
   embedCode: String
+  thumbnailUrl: String
   uploadedFile: FileFieldInput
   title: String
   description: String
   thumbnail: ImageFieldInput
   author: String
   videoId: String
+  mediaId: String
   duration: String
   isNew: Boolean
   createdAt: DateTime

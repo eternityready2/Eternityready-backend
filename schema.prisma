@@ -59,8 +59,9 @@ model SecurityAnswer {
 model Video {
   id                    String     @id @default(cuid())
   sourceType            String?    @default("youtube")
-  youtubeUrl            String     @default("")
+  youtubeUrl            String?    @mysql.Text
   embedCode             String?    @mysql.Text
+  thumbnailUrl          String?    @mysql.Text
   uploadedFile_filesize Int?
   uploadedFile_filename String?
   title                 String     @default("")
@@ -71,7 +72,8 @@ model Video {
   thumbnail_height      Int?
   thumbnail_extension   String?
   author                String     @default("")
-  videoId               String     @unique @default("")
+  videoId               String     @default("")
+  mediaId               String?    @unique
   duration              String     @default("")
   isNew                 Boolean    @default(false)
   createdAt             DateTime?  @default(now())

@@ -75,15 +75,9 @@ export const Video = list({
   access: {
     operation: {
       query: allowAll,
-      create: ({ session, context }) => {
-        return !!context.sudo || !!session?.isServer;
-      },
-      update: ({ session, context }) => {
-        return !!context.sudo || !!session?.isServer;
-      },
-      delete: ({ session, context }) => {
-        return !!context.sudo || !!session?.isServer;
-      },
+      create: allowAll,
+      update: allowAll,
+      delete: allowAll
     },
   },
 
@@ -108,11 +102,20 @@ export const Video = list({
         description:
           "Full YouTube video URL (e.g., https://www.youtube.com/watch?v=abc123).",
       },
+      db: { nativeType: "Text", isNullable: true },
     }),
     embedCode: text({
       ui: {
         description:
           "HTML embed code for videos from platforms other than YouTube",
+        itemView: { fieldMode: "read" },
+      },
+      db: { nativeType: "Text", isNullable: true },
+    }),
+
+    thumbnailUrl: text({
+      ui: {
+        description: "Thumbnail Url",
         itemView: { fieldMode: "read" },
       },
       db: { nativeType: "Text", isNullable: true },
@@ -165,12 +168,25 @@ export const Video = list({
 
     videoId: text({
       label: "ID from Video (YouTube)",
-      isIndexed: "unique",
       ui: {
         createView: { fieldMode: "hidden" },
         itemView: { fieldMode: "read" },
         description:
           "Unique video identifier on YouTube (extracted from the URL).",
+      },
+    }),
+
+    mediaId: text({
+      label: "ID from Media",
+      isIndexed: "unique",
+      db: { 
+        isNullable: true
+      },
+      ui: {
+        createView: { fieldMode: "hidden" },
+        itemView: { fieldMode: "read" },
+        description:
+          "Unique video identifier on Media",
       },
     }),
 
@@ -283,6 +299,7 @@ export const Video = list({
       }
     },
     resolveInput: async ({ resolvedData, operation, item, context }) => {
+      console.log(resolvedData);
       const rawConfig = resolvedData.sourceConfig;
 
       if (rawConfig && typeof rawConfig === "object") {
@@ -295,7 +312,35 @@ export const Video = list({
 
       const { sourceType, youtubeUrl } = resolvedData;
 
-      if (sourceType === "youtube" && youtubeUrl) {
+      // Handle EMBED thumbnail download
+      if (sourceType === "embed" && resolvedData.thumbnailUrl) {
+        try {
+          console.log('Downloading embed thumbnail:', resolvedData.thumbnailUrl);
+          const response = await axios.get(resolvedData.thumbnailUrl, { responseType: "stream" });
+          
+          if (response.status === 200) {
+            // Generate unique filename from embed code or timestamp
+            const ext = path.extname(resolvedData.thumbnailUrl) || '.jpg';
+            const filename = `embed-thumbnail-${resolvedData.mediaId}${ext}`;
+            
+            const imageData = await context.images("thumbnails").getDataFromStream(
+              response.data, 
+              filename
+            );
+            
+            console.log('Embed thumbnail saved:', filename);
+            return {
+              ...resolvedData,
+              thumbnail: imageData
+            };
+          }
+        } catch (error) {
+          console.error('Failed to download embed thumbnail:', error.message);
+        }
+      }
+
+      if (sourceType === "youtube" && youtubeUrl && youtubeUrl.trim() !== "") {
+        console.log("This doesn't execute");
         if (operation === "update" && youtubeUrl === item?.youtubeUrl) {
           return resolvedData;
         }
