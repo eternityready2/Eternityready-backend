@@ -11,6 +11,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { config as dotenvConfig } from "dotenv";
 
+import { graphql } from '@keystone-6/core';
 import { withAuth, session } from "./auth";
 import {
   featuredVideosHandler,
@@ -288,7 +289,42 @@ export default withAuth(
           res.json({ url: sessionCheckout.url });
         });
 
-        
+        app.post('/api/increment-views', async (req, res) => {
+          try {
+            const { id } = req.body;
+
+            const requestContext = await context.withRequest(req, res);
+
+            let video = null;
+
+            if (id) {
+              video = await requestContext.db.Video.findOne({ where: { id: id } });
+            }
+
+            if (!video) {
+              const videos = await requestContext.db.Video.findMany({
+                where: { mediaId: { equals: id } },
+                take: 1,
+              });
+              video = videos[0];
+            }
+
+            if (!video) {
+              return res.status(404).json({ message: 'Video not found' });
+            }
+
+            const currentViews = video.views || 0;
+            const updated = await requestContext.db.Video.updateOne({
+              where: { id: video.id },
+              data: { views: currentViews + 1 }
+            });
+
+            res.json({ success: true, video: updated });
+          } catch (err) {
+            console.error('Increment views error:', err);
+            res.status(500).json({ success: false, error: err.message });
+          }
+        });
         app.use(async (err: any, req: Request, res: Response, next: any) => {
           console.error('Global error:', err.message || err);
           console.error('Stack:', err.stack);

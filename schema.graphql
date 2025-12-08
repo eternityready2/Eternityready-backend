@@ -338,6 +338,7 @@ type Video {
   author: String
   videoId: String
   mediaId: String
+  views: Int
   duration: String
   isNew: Boolean
   createdAt: DateTime
@@ -376,6 +377,7 @@ input VideoWhereInput {
   author: StringFilter
   videoId: StringFilter
   mediaId: StringNullableFilter
+  views: IntFilter
   duration: StringFilter
   isNew: BooleanFilter
   createdAt: DateTimeNullableFilter
@@ -386,6 +388,17 @@ input VideoWhereInput {
   isRestricted: BooleanFilter
   verificationMessage: StringFilter
   publishedAt: DateTimeNullableFilter
+}
+
+input IntFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntFilter
 }
 
 input BooleanFilter {
@@ -410,6 +423,7 @@ input VideoOrderByInput {
   author: OrderDirection
   videoId: OrderDirection
   mediaId: OrderDirection
+  views: OrderDirection
   duration: OrderDirection
   isNew: OrderDirection
   createdAt: OrderDirection
@@ -433,6 +447,7 @@ input VideoUpdateInput {
   author: String
   videoId: String
   mediaId: String
+  views: Int
   duration: String
   isNew: Boolean
   createdAt: DateTime
@@ -473,6 +488,7 @@ input VideoCreateInput {
   author: String
   videoId: String
   mediaId: String
+  views: Int
   duration: String
   isNew: Boolean
   createdAt: DateTime

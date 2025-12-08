@@ -8,6 +8,7 @@ import {
   file,
   image,
   select,
+  integer,
 } from "@keystone-6/core/fields";
 import { allowAll } from "@keystone-6/core/access";
 import axios from "axios";
@@ -187,6 +188,19 @@ export const Video = list({
         itemView: { fieldMode: "read" },
         description:
           "Unique video identifier on Media",
+      },
+    }),
+
+    views: integer({
+      defaultValue: 0,
+      db: {
+        isNullable: false,
+      },
+      ui: {
+        description: "Video Views (defaults to 0)",
+      },
+      validation: {
+        min: 0,
       },
     }),
 

@@ -74,6 +74,7 @@ model Video {
   author                String     @default("")
   videoId               String     @default("")
   mediaId               String?    @unique
+  views                 Int        @default(0)
   duration              String     @default("")
   isNew                 Boolean    @default(false)
   createdAt             DateTime?  @default(now())
