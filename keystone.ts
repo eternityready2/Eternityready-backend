@@ -291,22 +291,14 @@ export default withAuth(
 
         app.post('/api/increment-views', async (req, res) => {
           try {
-            const { id } = req.body;
+            const { title } = req.body;
 
             const requestContext = await context.withRequest(req, res);
 
             let video = null;
 
-            if (id) {
-              video = await requestContext.db.Video.findOne({ where: { id: id } });
-            }
-
-            if (!video) {
-              const videos = await requestContext.db.Video.findMany({
-                where: { mediaId: { equals: id } },
-                take: 1,
-              });
-              video = videos[0];
+            if (title) {
+              video = await requestContext.db.Video.findOne({ where: { title: title } });
             }
 
             if (!video) {

@@ -122,6 +122,7 @@ export const videoHandler = async (
         thumbnail { url }
         author
         categories { id name }
+        embedCode
       `,
     });
 

@@ -337,7 +337,6 @@ type Video {
   thumbnail: ImageFieldOutput
   author: String
   videoId: String
-  mediaId: String
   views: Int
   duration: String
   isNew: Boolean
@@ -360,7 +359,7 @@ type FileFieldOutput {
 
 input VideoWhereUniqueInput {
   id: ID
-  mediaId: String
+  title: String
 }
 
 input VideoWhereInput {
@@ -376,7 +375,6 @@ input VideoWhereInput {
   description: StringNullableFilter
   author: StringFilter
   videoId: StringFilter
-  mediaId: StringNullableFilter
   views: IntFilter
   duration: StringFilter
   isNew: BooleanFilter
@@ -422,7 +420,6 @@ input VideoOrderByInput {
   description: OrderDirection
   author: OrderDirection
   videoId: OrderDirection
-  mediaId: OrderDirection
   views: OrderDirection
   duration: OrderDirection
   isNew: OrderDirection
@@ -446,7 +443,6 @@ input VideoUpdateInput {
   thumbnail: ImageFieldInput
   author: String
   videoId: String
-  mediaId: String
   views: Int
   duration: String
   isNew: Boolean
@@ -487,7 +483,6 @@ input VideoCreateInput {
   thumbnail: ImageFieldInput
   author: String
   videoId: String
-  mediaId: String
   views: Int
   duration: String
   isNew: Boolean

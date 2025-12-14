@@ -134,6 +134,7 @@ export const Video = list({
     }),
 
     title: text({
+      isIndexed: "unique",
       ui: {
         itemView: {
           fieldMode: "read",
@@ -177,20 +178,7 @@ export const Video = list({
       },
     }),
 
-    mediaId: text({
-      label: "ID from Media",
-      isIndexed: "unique",
-      db: { 
-        isNullable: true
-      },
-      ui: {
-        createView: { fieldMode: "hidden" },
-        itemView: { fieldMode: "read" },
-        description:
-          "Unique video identifier on Media",
-      },
-    }),
-
+    
     views: integer({
       defaultValue: 0,
       db: {
@@ -335,7 +323,7 @@ export const Video = list({
           if (response.status === 200) {
             // Generate unique filename from embed code or timestamp
             const ext = path.extname(resolvedData.thumbnailUrl) || '.jpg';
-            const filename = `embed-thumbnail-${resolvedData.mediaId}${ext}`;
+            const filename = `embed-thumbnail-${resolvedData.title}${ext}`;
             
             const imageData = await context.images("thumbnails").getDataFromStream(
               response.data, 

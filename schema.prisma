@@ -64,7 +64,7 @@ model Video {
   thumbnailUrl          String?    @mysql.Text
   uploadedFile_filesize Int?
   uploadedFile_filename String?
-  title                 String     @default("")
+  title                 String     @unique @default("")
   description           String?    @mysql.Text
   thumbnail_id          String?
   thumbnail_filesize    Int?
@@ -73,7 +73,6 @@ model Video {
   thumbnail_extension   String?
   author                String     @default("")
   videoId               String     @default("")
-  mediaId               String?    @unique
   views                 Int        @default(0)
   duration              String     @default("")
   isNew                 Boolean    @default(false)
