@@ -83,6 +83,8 @@ export const Video = list({
   },
 
   fields: {
+    comments: relationship({ ref: 'Comment.video', many: true }),
+    reactions: relationship({ ref: 'UserReaction.video', many: true }),
     sourceType: select({
       options: [
         { label: "Youtube", value: "youtube" },

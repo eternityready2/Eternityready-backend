@@ -1,5 +1,7 @@
 import { type Lists, Session } from ".keystone/types";
 
+import { Comment } from "./schemas/comment";
+import { UserReaction } from "./schemas/userReaction";
 import { Video } from "./schemas/video";
 import { Ad, AdStat } from "./schemas/ad";
 import { Category } from "./schemas/category";
@@ -24,7 +26,7 @@ export const lists = {
   User: list({
     access: {
       operation: {
-        query: ({ session }) => !!session,
+        query: allowAll,
         create: () => true,
         update: ({ session }) => !!session,
         delete: ({ session }) => !!session,
@@ -46,9 +48,12 @@ export const lists = {
       },
       filter: {
         query: ({ session }) => {
+          return true;
+          /*
           if (!session) return false;
           if (isAdmin({ session })) return true;
           return { id: { equals: session.itemId } };
+          */
         },
       },
     },
@@ -88,6 +93,8 @@ export const lists = {
       stripeStatus: text({
         db: { isNullable: true },
       }),
+      comments: relationship({ ref: 'Comment.user', many: true }),
+      reactions: relationship({ ref: 'UserReaction.user', many: true }),
     },
   }),
 
@@ -139,4 +146,6 @@ export const lists = {
   AdStat,
   Category,
   Instagram,
+  Comment,
+  UserReaction,
 } satisfies Lists;

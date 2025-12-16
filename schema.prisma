@@ -28,6 +28,8 @@ model User {
   stripeCustomerId         String?          @unique
   stripeSubscriptionId     String?
   stripeStatus             String?
+  comments                 Comment[]        @relation("Comment_user")
+  reactions                UserReaction[]   @relation("UserReaction_user")
   from_SecurityAnswer_user SecurityAnswer[] @relation("SecurityAnswer_user")
 }
 
@@ -57,32 +59,34 @@ model SecurityAnswer {
 }
 
 model Video {
-  id                    String     @id @default(cuid())
-  sourceType            String?    @default("youtube")
-  youtubeUrl            String?    @mysql.Text
-  embedCode             String?    @mysql.Text
-  thumbnailUrl          String?    @mysql.Text
+  id                    String         @id @default(cuid())
+  comments              Comment[]      @relation("Comment_video")
+  reactions             UserReaction[] @relation("UserReaction_video")
+  sourceType            String?        @default("youtube")
+  youtubeUrl            String?        @mysql.Text
+  embedCode             String?        @mysql.Text
+  thumbnailUrl          String?        @mysql.Text
   uploadedFile_filesize Int?
   uploadedFile_filename String?
-  title                 String     @unique @default("")
-  description           String?    @mysql.Text
+  title                 String         @unique @default("")
+  description           String?        @mysql.Text
   thumbnail_id          String?
   thumbnail_filesize    Int?
   thumbnail_width       Int?
   thumbnail_height      Int?
   thumbnail_extension   String?
-  author                String     @default("")
-  videoId               String     @default("")
-  views                 Int        @default(0)
-  duration              String     @default("")
-  isNew                 Boolean    @default(false)
-  createdAt             DateTime?  @default(now())
-  isPublic              Boolean    @default(true)
-  featured              Boolean    @default(false)
-  highlight             Boolean    @default(false)
-  categories            Category[] @relation("Category_videos")
-  isRestricted          Boolean    @default(false)
-  verificationMessage   String     @default("")
+  author                String         @default("")
+  videoId               String         @default("")
+  views                 Int            @default(0)
+  duration              String         @default("")
+  isNew                 Boolean        @default(false)
+  createdAt             DateTime?      @default(now())
+  isPublic              Boolean        @default(true)
+  featured              Boolean        @default(false)
+  highlight             Boolean        @default(false)
+  categories            Category[]     @relation("Category_videos")
+  isRestricted          Boolean        @default(false)
+  verificationMessage   String         @default("")
   publishedAt           DateTime?
 }
 
@@ -136,4 +140,37 @@ model Instagram {
   categories  Category[] @relation("Category_instagram")
   author      String     @default("")
   createdAt   DateTime?  @default(now())
+}
+
+model Comment {
+  id        String         @id @default(cuid())
+  user      User?          @relation("Comment_user", fields: [userId], references: [id])
+  userId    String?        @map("user")
+  text      String         @default("")
+  timestamp DateTime?      @default(now())
+  parent    Comment?       @relation("Comment_parent", fields: [parentId], references: [id])
+  parentId  String?        @map("parent")
+  replies   Comment[]      @relation("Comment_parent")
+  video     Video?         @relation("Comment_video", fields: [videoId], references: [id])
+  videoId   String?        @map("video")
+  reactions UserReaction[] @relation("UserReaction_comment")
+
+  @@index([userId])
+  @@index([parentId])
+  @@index([videoId])
+}
+
+model UserReaction {
+  id        String   @id @default(cuid())
+  user      User?    @relation("UserReaction_user", fields: [userId], references: [id])
+  userId    String?  @map("user")
+  reaction  String
+  comment   Comment? @relation("UserReaction_comment", fields: [commentId], references: [id])
+  commentId String?  @map("comment")
+  video     Video?   @relation("UserReaction_video", fields: [videoId], references: [id])
+  videoId   String?  @map("video")
+
+  @@index([userId])
+  @@index([commentId])
+  @@index([videoId])
 }

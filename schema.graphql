@@ -15,6 +15,10 @@ type User {
   stripeCustomerId: String
   stripeSubscriptionId: String
   stripeStatus: String
+  comments(where: CommentWhereInput! = {}, orderBy: [CommentOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CommentWhereUniqueInput): [Comment!]
+  commentsCount(where: CommentWhereInput! = {}): Int
+  reactions(where: UserReactionWhereInput! = {}, orderBy: [UserReactionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: UserReactionWhereUniqueInput): [UserReaction!]
+  reactionsCount(where: UserReactionWhereInput! = {}): Int
 }
 
 type PasswordState {
@@ -59,6 +63,8 @@ input UserWhereInput {
   stripeCustomerId: StringNullableFilter
   stripeSubscriptionId: StringNullableFilter
   stripeStatus: StringNullableFilter
+  comments: CommentManyRelationFilter
+  reactions: UserReactionManyRelationFilter
 }
 
 input IDFilter {
@@ -131,6 +137,18 @@ input StringNullableFilter {
   not: StringNullableFilter
 }
 
+input CommentManyRelationFilter {
+  every: CommentWhereInput
+  some: CommentWhereInput
+  none: CommentWhereInput
+}
+
+input UserReactionManyRelationFilter {
+  every: UserReactionWhereInput
+  some: UserReactionWhereInput
+  none: UserReactionWhereInput
+}
+
 input UserOrderByInput {
   id: OrderDirection
   firstName: OrderDirection
@@ -160,6 +178,8 @@ input UserUpdateInput {
   stripeCustomerId: String
   stripeSubscriptionId: String
   stripeStatus: String
+  comments: CommentRelateToManyForUpdateInput
+  reactions: UserReactionRelateToManyForUpdateInput
 }
 
 input SecurityAnswerRelateToManyForUpdateInput {
@@ -175,6 +195,20 @@ input ImageFieldInput {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+input CommentRelateToManyForUpdateInput {
+  disconnect: [CommentWhereUniqueInput!]
+  set: [CommentWhereUniqueInput!]
+  create: [CommentCreateInput!]
+  connect: [CommentWhereUniqueInput!]
+}
+
+input UserReactionRelateToManyForUpdateInput {
+  disconnect: [UserReactionWhereUniqueInput!]
+  set: [UserReactionWhereUniqueInput!]
+  create: [UserReactionCreateInput!]
+  connect: [UserReactionWhereUniqueInput!]
+}
 
 input UserUpdateArgs {
   where: UserWhereUniqueInput!
@@ -193,11 +227,23 @@ input UserCreateInput {
   stripeCustomerId: String
   stripeSubscriptionId: String
   stripeStatus: String
+  comments: CommentRelateToManyForCreateInput
+  reactions: UserReactionRelateToManyForCreateInput
 }
 
 input SecurityAnswerRelateToManyForCreateInput {
   create: [SecurityAnswerCreateInput!]
   connect: [SecurityAnswerWhereUniqueInput!]
+}
+
+input CommentRelateToManyForCreateInput {
+  create: [CommentCreateInput!]
+  connect: [CommentWhereUniqueInput!]
+}
+
+input UserReactionRelateToManyForCreateInput {
+  create: [UserReactionCreateInput!]
+  connect: [UserReactionWhereUniqueInput!]
 }
 
 type SecurityQuestion {
@@ -327,6 +373,10 @@ input UserRelateToOneForCreateInput {
 
 type Video {
   id: ID!
+  comments(where: CommentWhereInput! = {}, orderBy: [CommentOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CommentWhereUniqueInput): [Comment!]
+  commentsCount(where: CommentWhereInput! = {}): Int
+  reactions(where: UserReactionWhereInput! = {}, orderBy: [UserReactionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: UserReactionWhereUniqueInput): [UserReaction!]
+  reactionsCount(where: UserReactionWhereInput! = {}): Int
   sourceType: String
   youtubeUrl: String
   embedCode: String
@@ -367,6 +417,8 @@ input VideoWhereInput {
   OR: [VideoWhereInput!]
   NOT: [VideoWhereInput!]
   id: IDFilter
+  comments: CommentManyRelationFilter
+  reactions: UserReactionManyRelationFilter
   sourceType: StringNullableFilter
   youtubeUrl: StringNullableFilter
   embedCode: StringNullableFilter
@@ -433,6 +485,8 @@ input VideoOrderByInput {
 }
 
 input VideoUpdateInput {
+  comments: CommentRelateToManyForUpdateInput
+  reactions: UserReactionRelateToManyForUpdateInput
   sourceType: String
   youtubeUrl: String
   embedCode: String
@@ -473,6 +527,8 @@ input VideoUpdateArgs {
 }
 
 input VideoCreateInput {
+  comments: CommentRelateToManyForCreateInput
+  reactions: UserReactionRelateToManyForCreateInput
   sourceType: String
   youtubeUrl: String
   embedCode: String
@@ -839,6 +895,137 @@ input InstagramCreateInput {
   createdAt: DateTime
 }
 
+type Comment {
+  id: ID!
+  user: User
+  text: String
+  timestamp: DateTime
+  parent: Comment
+  replies(where: CommentWhereInput! = {}, orderBy: [CommentOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CommentWhereUniqueInput): [Comment!]
+  repliesCount(where: CommentWhereInput! = {}): Int
+  video: Video
+  reactions(where: UserReactionWhereInput! = {}, orderBy: [UserReactionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: UserReactionWhereUniqueInput): [UserReaction!]
+  reactionsCount(where: UserReactionWhereInput! = {}): Int
+}
+
+input CommentWhereUniqueInput {
+  id: ID
+}
+
+input CommentWhereInput {
+  AND: [CommentWhereInput!]
+  OR: [CommentWhereInput!]
+  NOT: [CommentWhereInput!]
+  id: IDFilter
+  user: UserWhereInput
+  text: StringFilter
+  timestamp: DateTimeNullableFilter
+  parent: CommentWhereInput
+  replies: CommentManyRelationFilter
+  video: VideoWhereInput
+  reactions: UserReactionManyRelationFilter
+}
+
+input CommentOrderByInput {
+  id: OrderDirection
+  text: OrderDirection
+  timestamp: OrderDirection
+}
+
+input CommentUpdateInput {
+  user: UserRelateToOneForUpdateInput
+  text: String
+  timestamp: DateTime
+  parent: CommentRelateToOneForUpdateInput
+  replies: CommentRelateToManyForUpdateInput
+  video: VideoRelateToOneForUpdateInput
+  reactions: UserReactionRelateToManyForUpdateInput
+}
+
+input CommentRelateToOneForUpdateInput {
+  create: CommentCreateInput
+  connect: CommentWhereUniqueInput
+  disconnect: Boolean
+}
+
+input VideoRelateToOneForUpdateInput {
+  create: VideoCreateInput
+  connect: VideoWhereUniqueInput
+  disconnect: Boolean
+}
+
+input CommentUpdateArgs {
+  where: CommentWhereUniqueInput!
+  data: CommentUpdateInput!
+}
+
+input CommentCreateInput {
+  user: UserRelateToOneForCreateInput
+  text: String
+  timestamp: DateTime
+  parent: CommentRelateToOneForCreateInput
+  replies: CommentRelateToManyForCreateInput
+  video: VideoRelateToOneForCreateInput
+  reactions: UserReactionRelateToManyForCreateInput
+}
+
+input CommentRelateToOneForCreateInput {
+  create: CommentCreateInput
+  connect: CommentWhereUniqueInput
+}
+
+input VideoRelateToOneForCreateInput {
+  create: VideoCreateInput
+  connect: VideoWhereUniqueInput
+}
+
+type UserReaction {
+  id: ID!
+  user: User
+  reaction: String
+  comment: Comment
+  video: Video
+}
+
+input UserReactionWhereUniqueInput {
+  id: ID
+}
+
+input UserReactionWhereInput {
+  AND: [UserReactionWhereInput!]
+  OR: [UserReactionWhereInput!]
+  NOT: [UserReactionWhereInput!]
+  id: IDFilter
+  user: UserWhereInput
+  reaction: StringFilter
+  comment: CommentWhereInput
+  video: VideoWhereInput
+}
+
+input UserReactionOrderByInput {
+  id: OrderDirection
+  reaction: OrderDirection
+}
+
+input UserReactionUpdateInput {
+  user: UserRelateToOneForUpdateInput
+  reaction: String
+  comment: CommentRelateToOneForUpdateInput
+  video: VideoRelateToOneForUpdateInput
+}
+
+input UserReactionUpdateArgs {
+  where: UserReactionWhereUniqueInput!
+  data: UserReactionUpdateInput!
+}
+
+input UserReactionCreateInput {
+  user: UserRelateToOneForCreateInput
+  reaction: String
+  comment: CommentRelateToOneForCreateInput
+  video: VideoRelateToOneForCreateInput
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -893,6 +1080,18 @@ type Mutation {
   updateInstagrams(data: [InstagramUpdateArgs!]!): [Instagram]
   deleteInstagram(where: InstagramWhereUniqueInput!): Instagram
   deleteInstagrams(where: [InstagramWhereUniqueInput!]!): [Instagram]
+  createComment(data: CommentCreateInput!): Comment
+  createComments(data: [CommentCreateInput!]!): [Comment]
+  updateComment(where: CommentWhereUniqueInput!, data: CommentUpdateInput!): Comment
+  updateComments(data: [CommentUpdateArgs!]!): [Comment]
+  deleteComment(where: CommentWhereUniqueInput!): Comment
+  deleteComments(where: [CommentWhereUniqueInput!]!): [Comment]
+  createUserReaction(data: UserReactionCreateInput!): UserReaction
+  createUserReactions(data: [UserReactionCreateInput!]!): [UserReaction]
+  updateUserReaction(where: UserReactionWhereUniqueInput!, data: UserReactionUpdateInput!): UserReaction
+  updateUserReactions(data: [UserReactionUpdateArgs!]!): [UserReaction]
+  deleteUserReaction(where: UserReactionWhereUniqueInput!): UserReaction
+  deleteUserReactions(where: [UserReactionWhereUniqueInput!]!): [UserReaction]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -942,6 +1141,12 @@ type Query {
   instagram(where: InstagramWhereUniqueInput!): Instagram
   instagrams(where: InstagramWhereInput! = {}, orderBy: [InstagramOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: InstagramWhereUniqueInput): [Instagram!]
   instagramsCount(where: InstagramWhereInput! = {}): Int
+  comment(where: CommentWhereUniqueInput!): Comment
+  comments(where: CommentWhereInput! = {}, orderBy: [CommentOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CommentWhereUniqueInput): [Comment!]
+  commentsCount(where: CommentWhereInput! = {}): Int
+  userReaction(where: UserReactionWhereUniqueInput!): UserReaction
+  userReactions(where: UserReactionWhereInput! = {}, orderBy: [UserReactionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: UserReactionWhereUniqueInput): [UserReaction!]
+  userReactionsCount(where: UserReactionWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }
