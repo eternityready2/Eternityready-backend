@@ -317,6 +317,124 @@ export default withAuth(
             res.status(500).json({ success: false, error: err.message });
           }
         });
+
+        app.post('/api/react-content', async (req, res) => {
+          const requestContext = await context.withRequest(req, res);
+          const { userId, reaction, videoTitle, commentId } = req.body;
+
+          if (!userId || !reaction || (!videoTitle && !commentId)) {
+            return res.status(400).json({ error: 'Missing fields' });
+          }
+
+          if (!['like', 'dislike'].includes(reaction)) {
+            return res.status(400).json({ error: 'Invalid reaction' });
+          }
+
+          try {
+            let videoId;
+
+            if (videoTitle) {
+              const videos = await context.query.Video.findMany({
+                where: { title: { equals: videoTitle } },
+                query: 'id',
+              });
+
+              if (!videos.length) {
+                return res.status(404).json({ error: 'Video not found' });
+              }
+              videoId = videos[0].id;
+            }
+
+            const existing = await context.query.UserReaction.findMany({
+              where: {
+                user: { id: { equals: userId } },
+                ...(videoId && { video: { id: { equals: videoId } } }),
+                ...(commentId && { comment: { id: { equals: commentId } } }),
+              },
+              query: 'id reaction',
+            });
+
+            if (existing.length) {
+              const existingReaction = existing[0];
+
+              if (existingReaction.reaction === reaction) {
+                await context.query.UserReaction.deleteOne({
+                  where: { id: existingReaction.id },
+                });
+                return res.json({ status: 'deleted', reaction });
+              }
+
+              const updated = await context.query.UserReaction.updateOne({
+                where: { id: existingReaction.id },
+                data: { reaction },
+                query: 'id reaction',
+              });
+
+              return res.json({ status: 'updated', reaction: updated.reaction });
+            }
+
+            const created = await context.query.UserReaction.createOne({
+              data: {
+                reaction,
+                user: { connect: { id: userId } },
+                video: { connect: { id: videoId } },
+                ...(commentId && { comment: { connect: { id: commentId } } }),
+                ...(videoId && { video: { connect: { id: videoId } } })
+              },
+              query: 'id reaction',
+            });
+
+            return res.json({ status: 'created', reaction: created.reaction });
+
+          } catch (e) {
+            console.error(e);
+            return res.status(500).json({ error: 'Internal server error' });
+          }
+        });
+
+        app.post('/api/reactions', async (req, res) => {
+          try {
+            const requestContext = await context.withRequest(req, res);
+            const { videoTitle, commentId } = req.body;
+            if (!videoTitle && !commentId) {
+              return res.status(400).json({
+                error: 'Provide either videoTitle or commentId',
+              });
+            }
+
+            let where;
+
+            if (videoTitle) {
+              where = {
+                video: { title: { equals: videoTitle } },
+                comment: null,
+              };
+            } else if (commentId) {
+              where = { comment: { id: { equals: commentId } } };
+            }
+
+            const reactions = await requestContext.query.UserReaction.findMany({
+              where,
+              query: 'id reaction',
+            });
+
+            const likeCount = reactions.filter(r => r.reaction === 'like').length;
+            const dislikeCount = reactions.filter(
+              r => r.reaction === 'dislike'
+            ).length;
+
+            return res.json({
+              like: likeCount,
+              dislike: dislikeCount,
+            });
+
+          } catch (e) {
+            console.error(e);
+            return res.status(500).json({ error: 'Internal server error' });
+          }
+        });
+
+
         app.use(async (err: any, req: Request, res: Response, next: any) => {
           console.error('Global error:', err.message || err);
           console.error('Stack:', err.stack);
