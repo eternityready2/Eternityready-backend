@@ -24,7 +24,10 @@ export const Category = list({
     },
   },
   fields: {
-    name: text({ validation: { isRequired: true } }),
+    name: text({
+      validation: { isRequired: true },
+      isIndexed: 'unique',
+    }),
     videos: relationship({ ref: "Video.categories", many: true }),
     instagram: relationship({ ref: "Instagram.categories", many: true }),
   },

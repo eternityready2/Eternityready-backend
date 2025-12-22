@@ -246,6 +246,66 @@ export default withAuth(
           await passwordResetHandler(req, res, context);
         });
 
+        app.post("/api/create-video", async (req: Request, res: Response) => {
+          try {
+            const requestContext = await context.withRequest(req, res);
+            const { categories, ...videoData } = req.body;
+
+            const categoryIds = [];
+            const createdCategories = [];
+
+            console.log('categories', categories, videoData);
+            for (const name of (categories || [])) {
+              const existing = await requestContext.db.Category.findOne({
+                where: { name: name.trim() }
+              });
+
+              if (existing) {
+                categoryIds.push({ id: existing.id });
+              } else {
+                const newCategory = await requestContext.db.Category.createOne({
+                  data: { name: name.trim() }
+                });
+                createdCategories.push(newCategory);
+                categoryIds.push({ id: newCategory.id });
+              }
+            }
+
+            const video = await requestContext.db.Video.createOne({
+              data: {
+                sourceType: videoData.sourceType || "youtube",
+                youtubeUrl: videoData.youtubeUrl || null,
+                embedCode: videoData.embedCode || null,
+                title: videoData.title || null,
+                description: videoData.description || null,
+                author: videoData.author || null,
+                thumbnailUrl: videoData.thumbnailUrl || null,
+                isPublic: videoData.isPublic !== undefined ? videoData.isPublic : true,
+                featured: videoData.featured || false,
+                highlight: videoData.highlight || false,
+                verificationMessage: "",
+                isNew: false,
+                isRestricted: false,
+                categories: categoryIds.length ? { connect: categoryIds } : undefined
+              }
+            });
+
+            res.json({
+              success: true,
+              video: {
+                id: video.id,
+                title: video.title,
+                categories: video.categories || []
+              },
+              createdCategories
+            });
+
+          } catch (error) {
+            console.error('API Error:', error);
+            res.status(500).json({ success: false, errors: error});
+          }
+        });
+
         app.post('/api/create-checkout-session', async (req, res) => {
           const requestContext = await context.withRequest(req, res);
           const session = requestContext.session;

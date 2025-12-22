@@ -126,7 +126,7 @@ model AdStat {
 
 model Category {
   id        String      @id @default(cuid())
-  name      String      @default("")
+  name      String      @unique @default("")
   videos    Video[]     @relation("Category_videos")
   instagram Instagram[] @relation("Category_instagram")
 }

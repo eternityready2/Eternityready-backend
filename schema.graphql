@@ -760,6 +760,7 @@ type Category {
 
 input CategoryWhereUniqueInput {
   id: ID
+  name: String
 }
 
 input CategoryWhereInput {
