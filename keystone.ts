@@ -16,7 +16,7 @@ import { withAuth, session } from "./auth";
 import {
   featuredVideosHandler,
   searchHandler,
-  videoHandler,
+  videoTitleHandler,
 } from "./api/videos";
 import { categoryHandler } from "./api/categories";
 import { postSearchHandler } from "./api/instagram";
@@ -222,8 +222,8 @@ export default withAuth(
           await searchHandler(req, res, context);
         });
 
-        app.get("/api/video/:id", async (req: Request, res: Response) => {
-          await videoHandler(req, res, context);
+        app.get("/api/video/:title", async (req: Request, res: Response) => {
+          await videoTitleHandler(req, res, context);
         });
 
         app.get("/api/categories", async (req: Request, res: Response) => {

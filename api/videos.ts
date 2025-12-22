@@ -88,57 +88,6 @@ export const searchHandler = async (
   }
 };
 
-export const videoHandler = async (
-  req: Request,
-  res: Response,
-  context: KeystoneContext
-) => {
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  const { id: videoId } = req.params;
-  if (!videoId) {
-    return res
-      .status(400)
-      .json({ error: "The video ID is required in the URL." });
-  }
-
-  try {
-    const video = await context.query.Video.findOne({
-      where: {
-        id: videoId,
-      },
-      query: `  
-        id
-        sourceType
-        title
-        description
-        featured
-        videoId
-        duration
-        createdAt
-        isNew
-        thumbnail { url }
-        author
-        categories { id name }
-        embedCode
-      `,
-    });
-
-    if (!video) {
-      return res.status(404).json({ error: "Video not found or not public." });
-    }
-
-    return res.status(200).json({
-      video,
-    });
-  } catch (error) {
-    console.error("Erro ao buscar vídeos:", error);
-    return res.status(500).json({ error: "Erro interno ao buscar vídeos" });
-  }
-};
-
 export const featuredVideosHandler = async (
   req: Request,
   res: Response,
@@ -176,6 +125,58 @@ export const featuredVideosHandler = async (
 
     return res.status(200).json({
       videos,
+    });
+  } catch (error) {
+    console.error("Erro ao buscar vídeos:", error);
+    return res.status(500).json({ error: "Erro interno ao buscar vídeos" });
+  }
+};
+
+export const videoTitleHandler = async (
+  req: Request,
+  res: Response,
+  context: KeystoneContext
+) => {
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { title: videoTitle } = req.params;
+  if (!videoTitle) {
+    return res
+      .status(400)
+      .json({ error: "The video Title is required in the URL." });
+  }
+
+  try {
+    const video = await context.query.Video.findOne({
+      where: {
+        title: videoTitle,
+      },
+      query: `  
+        id
+        sourceType
+        title
+        description
+        featured
+        videoId
+        duration
+        createdAt
+        isNew
+        thumbnail { url }
+        author
+        categories { id name }
+        embedCode
+        views
+      `,
+    });
+
+    if (!video) {
+      return res.status(404).json({ error: "Video not found or not public." });
+    }
+
+    return res.status(200).json({
+      video,
     });
   } catch (error) {
     console.error("Erro ao buscar vídeos:", error);
