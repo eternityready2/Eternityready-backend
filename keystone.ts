@@ -246,6 +246,132 @@ export default withAuth(
           await passwordResetHandler(req, res, context);
         });
 
+        app.post("/api/subscribe", async (req: Request, res: Response) => {
+          try {
+            const requestContext = await context.withRequest(req, res);
+
+            if (req.method !== 'POST') {
+              return res.status(405).json({ error: 'Method not allowed. Use POST.' });
+            }
+
+            const { subscriberEmail, targetUserEmail } = req.body;
+
+            if (!subscriberEmail || !targetUserEmail) {
+              return res.status(400).json({ error: 'Both subscriberEmail and targetUserEmail are required.' });
+            }
+
+            if (subscriberEmail === targetUserEmail) {
+              return res.status(400).json({ error: 'You cannot subscribe to yourself.' });
+            }
+
+            // Fetch subscriber by email
+            const subscriber = await requestContext.query.User.findOne({
+              where: { email: subscriberEmail },
+              query: 'id email subscriptions { id email }',
+            });
+
+            // Fetch target user by email
+            const targetUser = await requestContext.query.User.findOne({
+              where: { email: targetUserEmail },
+              query: 'id email subscribers { id email } subscriberCount',
+            });
+
+            if (!subscriber || !targetUser) {
+              return res.status(404).json({ error: 'User not found.' });
+            }
+
+            // Check if already subscribed
+            const alreadySubscribed = subscriber.subscriptions.some(
+              (sub) => sub.email === targetUserEmail
+            );
+
+            if (alreadySubscribed) {
+              // Unsubscribe logic
+              const updatedSubscriptions = subscriber.subscriptions
+                .filter((sub) => sub.email !== targetUserEmail)
+                .map((sub) => ({ id: sub.id }));
+
+              await requestContext.sudo().db.User.updateOne({
+                where: { id: subscriber.id },
+                data: {
+                  subscriptions: { set: updatedSubscriptions },
+                },
+              });
+
+              await requestContext.sudo().db.User.updateOne({
+                where: { id: targetUser.id },
+                data: {
+                  subscriberCount: Math.max(targetUser.subscriberCount - 1, 0),
+                },
+              });
+
+              return res.status(200).json({
+                message: `User '${subscriberEmail}' unsubscribed from '${targetUserEmail}'.`,
+                subscribed: false,
+              });
+            }
+
+            // Subscribe logic
+            await requestContext.sudo().db.User.updateOne({
+              where: { id: subscriber.id },
+              data: {
+                subscriptions: {
+                  connect: { id: targetUser.id },
+                },
+              },
+            });
+
+            await requestContext.sudo().db.User.updateOne({
+              where: { id: targetUser.id },
+              data: {
+                subscriberCount: targetUser.subscriberCount + 1,
+              },
+            });
+
+            return res.status(200).json({
+              message: `User '${subscriberEmail}' subscribed to '${targetUserEmail}'.`,
+              subscribed: true,
+            });
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'An unexpected error occurred.', details: error.message });
+          }
+        });
+
+        app.post("/api/subscribers", async (req: Request, res: Response) => {
+          try {
+              const requestContext = await context.withRequest(req, res);
+              if (req.method !== 'POST') {
+                return res.status(405).json({ error: 'Method not allowed. Use POST.' });
+              }
+
+              const { email } = req.body;
+
+              if (!email) {
+                return res.status(400).json({ error: 'Email is required.' });
+              }
+
+              const user = await requestContext.query.User.findOne({
+                where: { email },
+                query: 'id email subscriberCount',
+              });
+
+              if (!user) {
+                return res.status(404).json({ error: 'User not found.' });
+              }
+
+              return res.status(200).json({
+                email: user.email,
+                subscriberCount: user.subscriberCount,
+              });
+            } catch (error) {
+              console.error(error);
+              return res
+                .status(500)
+                .json({ error: 'An unexpected error occurred.', details: error.message });
+            }
+        });
+
         app.post("/api/create-video", async (req: Request, res: Response) => {
           try {
             const requestContext = await context.withRequest(req, res);

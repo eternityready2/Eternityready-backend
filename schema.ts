@@ -15,6 +15,7 @@ import {
   timestamp,
   select,
   image,
+  integer
 } from "@keystone-6/core/fields";
 import { allowAll } from "@keystone-6/core/access";
 
@@ -95,6 +96,34 @@ export const lists = {
       }),
       comments: relationship({ ref: 'Comment.user', many: true }),
       reactions: relationship({ ref: 'UserReaction.user', many: true }),
+      subscriptions: relationship({
+        ref: 'User.subscribers',
+        many: true,
+        ui: {
+          description: 'Users this user subscribes to',
+        },
+      }),
+
+      subscribers: relationship({
+        ref: 'User.subscriptions',
+        many: true,
+        ui: {
+          description: 'Users who subscribe to this user',
+        },
+      }),
+
+      subscriberCount: integer({
+        defaultValue: 0,
+        db: {
+          isNullable: false,
+        },
+        ui: {
+          description: 'Subscribers (defaults to 0)',
+        },
+        validation: {
+          min: 0,
+        },
+      }),
     },
   }),
 
