@@ -6,6 +6,7 @@ import { Video } from "./schemas/video";
 import { Ad, AdStat } from "./schemas/ad";
 import { Category } from "./schemas/category";
 import { Instagram } from "./schemas/instagram";
+import { Report, ReportReason } from "./schemas/report";
 import { list } from "@keystone-6/core";
 
 import {
@@ -124,6 +125,7 @@ export const lists = {
           min: 0,
         },
       }),
+      reports: relationship({ ref: 'Report.user', many: true }),
     },
   }),
 
@@ -177,4 +179,6 @@ export const lists = {
   Instagram,
   Comment,
   UserReaction,
+  Report,
+  ReportReason,
 } satisfies Lists;

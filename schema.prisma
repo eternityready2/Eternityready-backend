@@ -33,6 +33,7 @@ model User {
   subscriptions            User[]           @relation("User_subscribers")
   subscribers              User[]           @relation("User_subscribers")
   subscriberCount          Int              @default(0)
+  reports                  Report[]         @relation("Report_user")
   from_SecurityAnswer_user SecurityAnswer[] @relation("SecurityAnswer_user")
 }
 
@@ -91,6 +92,7 @@ model Video {
   isRestricted          Boolean        @default(false)
   verificationMessage   String         @default("")
   publishedAt           DateTime?
+  reports               Report[]       @relation("Report_video")
 }
 
 model Ad {
@@ -176,4 +178,26 @@ model UserReaction {
   @@index([userId])
   @@index([commentId])
   @@index([videoId])
+}
+
+model Report {
+  id        String        @id @default(cuid())
+  video     Video?        @relation("Report_video", fields: [videoId], references: [id])
+  videoId   String?       @map("video")
+  user      User?         @relation("Report_user", fields: [userId], references: [id])
+  userId    String?       @map("user")
+  reason    ReportReason? @relation("Report_reason", fields: [reasonId], references: [id])
+  reasonId  String?       @map("reason")
+  details   String        @default("")
+  createdAt DateTime?     @default(now())
+
+  @@index([videoId])
+  @@index([userId])
+  @@index([reasonId])
+}
+
+model ReportReason {
+  id      String   @id @default(cuid())
+  name    String   @unique @default("")
+  reports Report[] @relation("Report_reason")
 }

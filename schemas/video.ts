@@ -270,6 +270,7 @@ export const Video = list({
         description: "Original publication date of the video on YouTube.",
       },
     }),
+    reports: relationship({ ref: 'Report.video', many: true }),
   },
 
   ui: {
@@ -283,6 +284,7 @@ export const Video = list({
       ],
     },
   },
+
 
   hooks: {
     validateInput: async ({ resolvedData, addValidationError, operation }) => {

@@ -24,6 +24,8 @@ type User {
   subscribers(where: UserWhereInput! = {}, orderBy: [UserOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: UserWhereUniqueInput): [User!]
   subscribersCount(where: UserWhereInput! = {}): Int
   subscriberCount: Int
+  reports(where: ReportWhereInput! = {}, orderBy: [ReportOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ReportWhereUniqueInput): [Report!]
+  reportsCount(where: ReportWhereInput! = {}): Int
 }
 
 type PasswordState {
@@ -73,6 +75,7 @@ input UserWhereInput {
   subscriptions: UserManyRelationFilter
   subscribers: UserManyRelationFilter
   subscriberCount: IntFilter
+  reports: ReportManyRelationFilter
 }
 
 input IDFilter {
@@ -174,6 +177,12 @@ input IntFilter {
   not: IntFilter
 }
 
+input ReportManyRelationFilter {
+  every: ReportWhereInput
+  some: ReportWhereInput
+  none: ReportWhereInput
+}
+
 input UserOrderByInput {
   id: OrderDirection
   firstName: OrderDirection
@@ -209,6 +218,7 @@ input UserUpdateInput {
   subscriptions: UserRelateToManyForUpdateInput
   subscribers: UserRelateToManyForUpdateInput
   subscriberCount: Int
+  reports: ReportRelateToManyForUpdateInput
 }
 
 input SecurityAnswerRelateToManyForUpdateInput {
@@ -246,6 +256,13 @@ input UserRelateToManyForUpdateInput {
   connect: [UserWhereUniqueInput!]
 }
 
+input ReportRelateToManyForUpdateInput {
+  disconnect: [ReportWhereUniqueInput!]
+  set: [ReportWhereUniqueInput!]
+  create: [ReportCreateInput!]
+  connect: [ReportWhereUniqueInput!]
+}
+
 input UserUpdateArgs {
   where: UserWhereUniqueInput!
   data: UserUpdateInput!
@@ -268,6 +285,7 @@ input UserCreateInput {
   subscriptions: UserRelateToManyForCreateInput
   subscribers: UserRelateToManyForCreateInput
   subscriberCount: Int
+  reports: ReportRelateToManyForCreateInput
 }
 
 input SecurityAnswerRelateToManyForCreateInput {
@@ -288,6 +306,11 @@ input UserReactionRelateToManyForCreateInput {
 input UserRelateToManyForCreateInput {
   create: [UserCreateInput!]
   connect: [UserWhereUniqueInput!]
+}
+
+input ReportRelateToManyForCreateInput {
+  create: [ReportCreateInput!]
+  connect: [ReportWhereUniqueInput!]
 }
 
 type SecurityQuestion {
@@ -443,6 +466,8 @@ type Video {
   isRestricted: Boolean
   verificationMessage: String
   publishedAt: DateTime
+  reports(where: ReportWhereInput! = {}, orderBy: [ReportOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ReportWhereUniqueInput): [Report!]
+  reportsCount(where: ReportWhereInput! = {}): Int
 }
 
 type FileFieldOutput {
@@ -482,6 +507,7 @@ input VideoWhereInput {
   isRestricted: BooleanFilter
   verificationMessage: StringFilter
   publishedAt: DateTimeNullableFilter
+  reports: ReportManyRelationFilter
 }
 
 input BooleanFilter {
@@ -541,6 +567,7 @@ input VideoUpdateInput {
   isRestricted: Boolean
   verificationMessage: String
   publishedAt: DateTime
+  reports: ReportRelateToManyForUpdateInput
 }
 
 input FileFieldInput {
@@ -583,6 +610,7 @@ input VideoCreateInput {
   isRestricted: Boolean
   verificationMessage: String
   publishedAt: DateTime
+  reports: ReportRelateToManyForCreateInput
 }
 
 input CategoryRelateToManyForCreateInput {
@@ -1060,6 +1088,110 @@ input UserReactionCreateInput {
   video: VideoRelateToOneForCreateInput
 }
 
+type Report {
+  id: ID!
+  video: Video
+  user: User
+  reason: ReportReason
+  details: String
+  createdAt: DateTime
+}
+
+input ReportWhereUniqueInput {
+  id: ID
+}
+
+input ReportWhereInput {
+  AND: [ReportWhereInput!]
+  OR: [ReportWhereInput!]
+  NOT: [ReportWhereInput!]
+  id: IDFilter
+  video: VideoWhereInput
+  user: UserWhereInput
+  reason: ReportReasonWhereInput
+  details: StringFilter
+  createdAt: DateTimeNullableFilter
+}
+
+input ReportOrderByInput {
+  id: OrderDirection
+  details: OrderDirection
+  createdAt: OrderDirection
+}
+
+input ReportUpdateInput {
+  video: VideoRelateToOneForUpdateInput
+  user: UserRelateToOneForUpdateInput
+  reason: ReportReasonRelateToOneForUpdateInput
+  details: String
+  createdAt: DateTime
+}
+
+input ReportReasonRelateToOneForUpdateInput {
+  create: ReportReasonCreateInput
+  connect: ReportReasonWhereUniqueInput
+  disconnect: Boolean
+}
+
+input ReportUpdateArgs {
+  where: ReportWhereUniqueInput!
+  data: ReportUpdateInput!
+}
+
+input ReportCreateInput {
+  video: VideoRelateToOneForCreateInput
+  user: UserRelateToOneForCreateInput
+  reason: ReportReasonRelateToOneForCreateInput
+  details: String
+  createdAt: DateTime
+}
+
+input ReportReasonRelateToOneForCreateInput {
+  create: ReportReasonCreateInput
+  connect: ReportReasonWhereUniqueInput
+}
+
+type ReportReason {
+  id: ID!
+  name: String
+  reports(where: ReportWhereInput! = {}, orderBy: [ReportOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ReportWhereUniqueInput): [Report!]
+  reportsCount(where: ReportWhereInput! = {}): Int
+}
+
+input ReportReasonWhereUniqueInput {
+  id: ID
+  name: String
+}
+
+input ReportReasonWhereInput {
+  AND: [ReportReasonWhereInput!]
+  OR: [ReportReasonWhereInput!]
+  NOT: [ReportReasonWhereInput!]
+  id: IDFilter
+  name: StringFilter
+  reports: ReportManyRelationFilter
+}
+
+input ReportReasonOrderByInput {
+  id: OrderDirection
+  name: OrderDirection
+}
+
+input ReportReasonUpdateInput {
+  name: String
+  reports: ReportRelateToManyForUpdateInput
+}
+
+input ReportReasonUpdateArgs {
+  where: ReportReasonWhereUniqueInput!
+  data: ReportReasonUpdateInput!
+}
+
+input ReportReasonCreateInput {
+  name: String
+  reports: ReportRelateToManyForCreateInput
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -1126,6 +1258,18 @@ type Mutation {
   updateUserReactions(data: [UserReactionUpdateArgs!]!): [UserReaction]
   deleteUserReaction(where: UserReactionWhereUniqueInput!): UserReaction
   deleteUserReactions(where: [UserReactionWhereUniqueInput!]!): [UserReaction]
+  createReport(data: ReportCreateInput!): Report
+  createReports(data: [ReportCreateInput!]!): [Report]
+  updateReport(where: ReportWhereUniqueInput!, data: ReportUpdateInput!): Report
+  updateReports(data: [ReportUpdateArgs!]!): [Report]
+  deleteReport(where: ReportWhereUniqueInput!): Report
+  deleteReports(where: [ReportWhereUniqueInput!]!): [Report]
+  createReportReason(data: ReportReasonCreateInput!): ReportReason
+  createReportReasons(data: [ReportReasonCreateInput!]!): [ReportReason]
+  updateReportReason(where: ReportReasonWhereUniqueInput!, data: ReportReasonUpdateInput!): ReportReason
+  updateReportReasons(data: [ReportReasonUpdateArgs!]!): [ReportReason]
+  deleteReportReason(where: ReportReasonWhereUniqueInput!): ReportReason
+  deleteReportReasons(where: [ReportReasonWhereUniqueInput!]!): [ReportReason]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -1181,6 +1325,12 @@ type Query {
   userReaction(where: UserReactionWhereUniqueInput!): UserReaction
   userReactions(where: UserReactionWhereInput! = {}, orderBy: [UserReactionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: UserReactionWhereUniqueInput): [UserReaction!]
   userReactionsCount(where: UserReactionWhereInput! = {}): Int
+  report(where: ReportWhereUniqueInput!): Report
+  reports(where: ReportWhereInput! = {}, orderBy: [ReportOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ReportWhereUniqueInput): [Report!]
+  reportsCount(where: ReportWhereInput! = {}): Int
+  reportReason(where: ReportReasonWhereUniqueInput!): ReportReason
+  reportReasons(where: ReportReasonWhereInput! = {}, orderBy: [ReportReasonOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ReportReasonWhereUniqueInput): [ReportReason!]
+  reportReasonsCount(where: ReportReasonWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }
