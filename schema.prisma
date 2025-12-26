@@ -197,7 +197,8 @@ model Report {
 }
 
 model ReportReason {
-  id      String   @id @default(cuid())
-  name    String   @unique @default("")
-  reports Report[] @relation("Report_reason")
+  id        String    @id @default(cuid())
+  name      String    @unique @default("")
+  reports   Report[]  @relation("Report_reason")
+  createdAt DateTime? @default(now())
 }

@@ -1156,6 +1156,7 @@ type ReportReason {
   name: String
   reports(where: ReportWhereInput! = {}, orderBy: [ReportOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ReportWhereUniqueInput): [Report!]
   reportsCount(where: ReportWhereInput! = {}): Int
+  createdAt: DateTime
 }
 
 input ReportReasonWhereUniqueInput {
@@ -1170,16 +1171,19 @@ input ReportReasonWhereInput {
   id: IDFilter
   name: StringFilter
   reports: ReportManyRelationFilter
+  createdAt: DateTimeNullableFilter
 }
 
 input ReportReasonOrderByInput {
   id: OrderDirection
   name: OrderDirection
+  createdAt: OrderDirection
 }
 
 input ReportReasonUpdateInput {
   name: String
   reports: ReportRelateToManyForUpdateInput
+  createdAt: DateTime
 }
 
 input ReportReasonUpdateArgs {
@@ -1190,6 +1194,7 @@ input ReportReasonUpdateArgs {
 input ReportReasonCreateInput {
   name: String
   reports: ReportRelateToManyForCreateInput
+  createdAt: DateTime
 }
 
 """

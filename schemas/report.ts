@@ -66,5 +66,10 @@ export const ReportReason = list({
       ref: 'Report.reason',
       many: true,
     }),
+
+    createdAt: timestamp({
+      db: { updatedAt: false },
+      defaultValue: { kind: 'now' },
+    }),
   },
 });
