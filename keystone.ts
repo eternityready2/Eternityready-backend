@@ -334,7 +334,7 @@ export default withAuth(
             });
           } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'An unexpected error occurred.', details: error.message });
+            return res.status(500).json({ error: 'Internal server error' });
           }
         });
 
@@ -368,7 +368,7 @@ export default withAuth(
               console.error(error);
               return res
                 .status(500)
-                .json({ error: 'An unexpected error occurred.', details: error.message });
+                .json({ error: 'An unexpected error occurred.' });
             }
         });
 
@@ -428,7 +428,7 @@ export default withAuth(
 
           } catch (error) {
             console.error('API Error:', error);
-            res.status(500).json({ success: false, errors: error});
+            return res.status(500).json({ error: 'Internal server error' });
           }
         });
 
@@ -500,7 +500,7 @@ export default withAuth(
             res.json({ success: true, video: updated });
           } catch (err) {
             console.error('Increment views error:', err);
-            res.status(500).json({ success: false, error: err.message });
+            return res.status(500).json({ error: 'Internal server error' });
           }
         });
 
