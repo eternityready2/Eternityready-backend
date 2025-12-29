@@ -11,6 +11,8 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { config as dotenvConfig } from "dotenv";
 
+import { OAuth2Client } from 'google-auth-library';
+
 import { graphql } from '@keystone-6/core';
 import { withAuth, session } from "./auth";
 import {
@@ -25,11 +27,27 @@ import { passwordResetHandler } from "./api/passwordReset";
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {});
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 dotenvConfig();
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map((origin) => origin.trim())
   : ["http://localhost:3000", "https://eternityready.com"];
+
+export async function createKeystoneSessionForUser(context, userId: string) {
+  if (!context.sessionStrategy) {
+    throw new Error('No sessionStrategy configured');
+  }
+
+  const session = await context.sessionStrategy.start({
+    context,
+    data: { listKey: 'User', itemId: userId },
+  });
+
+  const item = await context.db.User.findOne({ where: { id: userId } });
+
+  return { session, item };
+}
 
 export default withAuth(
   config({
@@ -620,6 +638,57 @@ export default withAuth(
           }
         });
 
+        app.post('/auth/google', async (req, res) => {
+          try {
+            const requestContext = await context.withRequest(req, res);
+            const { credential } = req.body;
+            const ticket = await client.verifyIdToken({
+              idToken: credential,
+              audience: process.env.GOOGLE_CLIENT_ID,
+            });
+            const payload = ticket.getPayload();
+            console.log('payload', payload);
+
+            const { email, given_name, family_name } = payload;
+
+            // Find or create user
+            const user = await requestContext.query.User.findOne({
+              where: { email },
+            });
+
+            let userId;
+            if (!user) {
+              const newUser = await requestContext.query.User.createOne({
+                data: {
+                  firstName: given_name,
+                  lastName: family_name,
+                  email,
+                  password: 'google-' + Math.random().toString(36).substring(2),
+                },
+              });
+              userId = newUser.id;
+            } else {
+              userId = user.id;
+            }
+
+            const { session, item } = await createKeystoneSessionForUser(
+              requestContext,
+              userId
+            );
+
+            return res.json({
+              session,
+              item: {
+                id: item.id,
+                email: item.email,
+                privilege: item.privilege,
+              },
+            });
+          } catch (err) {
+            console.error('Google auth error:', err);
+            return res.status(401).json({ error: 'Authentication failed' });
+          }
+        });
 
         app.use(async (err: any, req: Request, res: Response, next: any) => {
           console.error('Global error:', err.message || err);
