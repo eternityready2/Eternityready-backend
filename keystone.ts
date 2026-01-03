@@ -454,11 +454,7 @@ export default withAuth(
           const requestContext = await context.withRequest(req, res);
           const session = requestContext.session;
 
-          if (!session?.itemId) {
-            return res.status(401).json({ error: 'Not authenticated' });
-          }
-
-          const userId = session.itemId;
+          const userId = req.body.userId ?? session?.itemId ;
 
           const user = await context.sudo().db.User.findOne({ where: { id: userId } });
 
@@ -491,6 +487,48 @@ export default withAuth(
           });
 
           res.json({ url: sessionCheckout.url });
+        });
+
+        app.post('/api/stripe-checkout-success', async (req, res) => {
+          try {
+            const requestContext = await context.withRequest(req, res);
+            const { session_id } = req.body;
+
+            // 1. Retrieve Stripe checkout session
+            const checkoutSession = await stripe.checkout.sessions.retrieve(session_id);
+
+            // 2. Get keystone user id from metadata
+            const keystoneUserId = checkoutSession.metadata?.keystoneUserId;
+            if (!keystoneUserId) {
+              return res.status(400).json({ error: 'No keystoneUserId on session' });
+            }
+
+            // 3. Verify user exists
+            const user = await requestContext.sudo().db.User.findOne({ where: { id: keystoneUserId } });
+            if (!user) {
+              return res.status(404).json({ error: 'User not found' });
+            }
+
+            const { session, item } = await createKeystoneSessionForUser(
+              requestContext,
+              keystoneUserId
+            );
+
+            return res.json({
+              session,
+              item: {
+                id: item.id,
+                email: item.email,
+                privilege: item.privilege,
+              },
+            });
+
+            // 5. Return success so frontend can redirect user into app
+            res.json({ success: true });
+          } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Internal error' });
+          }
         });
 
         app.post('/api/increment-views', async (req, res) => {
