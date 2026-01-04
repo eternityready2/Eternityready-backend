@@ -79,7 +79,7 @@ export const lists = {
         ],
         defaultValue: 'normal',
         access: {
-          read: isAdmin,
+          read: allowAll,
           update: isAdmin,
           create: isAdmin,
         },
