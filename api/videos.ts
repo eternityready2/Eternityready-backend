@@ -72,15 +72,37 @@ export const searchHandler = async (
         thumbnail { url }
         author
         categories { id name }
+        reactions {
+          id
+          reaction
+        }
       `,
     });
 
     const totalCount = await context.query.Video.count({ where });
+    const sortedVideos = [...videos].sort((a, b) => {
+      const likesA = a.reactions.filter((r: any) => r.reaction === 'like').length;
+      const dislikesA = a.reactions.filter((r: any) => r.reaction === 'dislike').length;
+      const deltaA = likesA - dislikesA;
+
+      const likesB = b.reactions.filter((r: any) => r.reaction === 'like').length;
+      const dislikesB = b.reactions.filter((r: any) => r.reaction === 'dislike').length;
+      const deltaB = likesB - dislikesB;
+
+      if (deltaB !== deltaA) {
+        return deltaB - deltaA;
+      }
+
+      return (
+        new Date(b.createdAt).getTime() -
+        new Date(a.createdAt).getTime()
+      );
+    });
 
     return res.status(200).json({
       page,
       totalPages: Math.ceil(totalCount / PAGE_SIZE),
-      videos,
+      videos: sortedVideos,
     });
   } catch (error) {
     console.error("Erro ao buscar vídeos:", error);
