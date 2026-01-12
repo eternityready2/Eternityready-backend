@@ -468,6 +468,7 @@ type Video {
   publishedAt: DateTime
   reports(where: ReportWhereInput! = {}, orderBy: [ReportOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ReportWhereUniqueInput): [Report!]
   reportsCount(where: ReportWhereInput! = {}): Int
+  origin: String
 }
 
 type FileFieldOutput {
@@ -508,6 +509,7 @@ input VideoWhereInput {
   verificationMessage: StringFilter
   publishedAt: DateTimeNullableFilter
   reports: ReportManyRelationFilter
+  origin: StringNullableFilter
 }
 
 input BooleanFilter {
@@ -541,6 +543,7 @@ input VideoOrderByInput {
   isRestricted: OrderDirection
   verificationMessage: OrderDirection
   publishedAt: OrderDirection
+  origin: OrderDirection
 }
 
 input VideoUpdateInput {
@@ -568,6 +571,7 @@ input VideoUpdateInput {
   verificationMessage: String
   publishedAt: DateTime
   reports: ReportRelateToManyForUpdateInput
+  origin: String
 }
 
 input FileFieldInput {
@@ -611,6 +615,7 @@ input VideoCreateInput {
   verificationMessage: String
   publishedAt: DateTime
   reports: ReportRelateToManyForCreateInput
+  origin: String
 }
 
 input CategoryRelateToManyForCreateInput {

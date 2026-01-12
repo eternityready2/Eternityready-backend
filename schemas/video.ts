@@ -271,6 +271,15 @@ export const Video = list({
       },
     }),
     reports: relationship({ ref: 'Report.video', many: true }),
+    origin: text({
+      ui: {
+        createView: { fieldMode: "hidden" },
+        itemView: { fieldMode: "read" },
+        description: "Origin of the media (music, channels, movies)",
+      },
+      db: { nativeType: "Text", isNullable: true },
+    }),
+
   },
 
   ui: {

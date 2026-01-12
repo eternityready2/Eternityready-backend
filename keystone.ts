@@ -430,7 +430,8 @@ export default withAuth(
                 verificationMessage: "",
                 isNew: false,
                 isRestricted: false,
-                categories: categoryIds.length ? { connect: categoryIds } : undefined
+                origin: videoData.origin,
+                categories: categoryIds.length ? { connect: categoryIds } : undefined,
               }
             });
 

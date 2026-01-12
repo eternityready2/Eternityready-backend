@@ -93,6 +93,7 @@ model Video {
   verificationMessage   String         @default("")
   publishedAt           DateTime?
   reports               Report[]       @relation("Report_video")
+  origin                String?        @mysql.Text
 }
 
 model Ad {
