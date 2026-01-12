@@ -280,6 +280,19 @@ export const Video = list({
       db: { nativeType: "Text", isNullable: true },
     }),
 
+    rating: integer({
+      defaultValue: 0,
+      db: {
+        isNullable: true,
+      },
+      ui: {
+        description: "Video rating (defaults to 0)",
+      },
+      validation: {
+        min: 0,
+      },
+    }),
+
   },
 
   ui: {

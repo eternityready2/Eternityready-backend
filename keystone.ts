@@ -431,6 +431,7 @@ export default withAuth(
                 isNew: false,
                 isRestricted: false,
                 origin: videoData.origin,
+                rating: videoData.rating,
                 categories: categoryIds.length ? { connect: categoryIds } : undefined,
               }
             });

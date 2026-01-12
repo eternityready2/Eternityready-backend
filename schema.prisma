@@ -94,6 +94,7 @@ model Video {
   publishedAt           DateTime?
   reports               Report[]       @relation("Report_video")
   origin                String?        @mysql.Text
+  rating                Int?           @default(0)
 }
 
 model Ad {

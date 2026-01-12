@@ -1,5 +1,5 @@
-const API_BASE_URL = 'http://127.0.0.1:3000';
-const ETERNITY_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = 'https://api.eternityready.com';
+const ETERNITY_BASE_URL = 'https://eternityready.com';
 
 function normalizeDataForPlayer(item, origin) {
   const normalized = {
@@ -12,6 +12,7 @@ function normalizeDataForPlayer(item, origin) {
     videoId: null,
     thumbnailUrl: item.logo || item.thumbnail || null,
     origin: origin,
+    rating: item.rating,
     categories: item.categories,
   };
 
