@@ -376,12 +376,12 @@ export const Video = list({
         const videoId = getYouTubeVideoId(youtubeUrl);
         if (!videoId) return resolvedData;
 
-        const existing = await context.prisma.video.findUnique({
+        const existing = await context.prisma.video.findFirst({
           where: { videoId },
         });
 
         if (existing) {
-          console.warn(`Video with ID ${videoId} already exists.`);
+          console.warn(`Video with ID ${videoId} already exists.`, existing);
           throw new Error(
             `Video with ID ${videoId} already exists in the database.`
           );
