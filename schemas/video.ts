@@ -278,6 +278,7 @@ export const Video = list({
         description: "Origin of the media (music, channels, movies)",
       },
       db: { nativeType: "Text", isNullable: true },
+      defaultValue: "on-demand"
     }),
 
     rating: integer({
