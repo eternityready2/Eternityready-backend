@@ -282,7 +282,6 @@ export const Video = list({
       defaultValue: 'on-demand',
       ui: {
         displayMode: "segmented-control",
-        itemView: { fieldMode: 'read' },
         description: "Origin of the media (music, channels, movies)",
       },
     }),
