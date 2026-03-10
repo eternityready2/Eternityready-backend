@@ -63,38 +63,39 @@ model SecurityAnswer {
 }
 
 model Video {
-  id                    String         @id @default(cuid())
-  comments              Comment[]      @relation("Comment_video")
-  reactions             UserReaction[] @relation("UserReaction_video")
-  sourceType            String?        @default("youtube")
-  youtubeUrl            String?        @mysql.Text
-  embedCode             String?        @mysql.Text
-  thumbnailUrl          String?        @mysql.Text
+  id                    String           @id @default(cuid())
+  comments              Comment[]        @relation("Comment_video")
+  reactions             UserReaction[]   @relation("UserReaction_video")
+  sourceType            String?          @default("youtube")
+  youtubeUrl            String?          @mysql.Text
+  embedCode             String?          @mysql.Text
+  thumbnailUrl          String?          @mysql.Text
   uploadedFile_filesize Int?
   uploadedFile_filename String?
-  title                 String         @unique @default("")
-  description           String?        @mysql.Text
+  title                 String           @unique @default("")
+  description           String?          @mysql.Text
   thumbnail_id          String?
   thumbnail_filesize    Int?
   thumbnail_width       Int?
   thumbnail_height      Int?
   thumbnail_extension   String?
-  author                String         @default("")
-  videoId               String         @default("")
-  views                 Int            @default(0)
-  duration              String         @default("")
-  isNew                 Boolean        @default(false)
-  createdAt             DateTime?      @default(now())
-  isPublic              Boolean        @default(true)
-  featured              Boolean        @default(false)
-  highlight             Boolean        @default(false)
-  categories            Category[]     @relation("Category_videos")
-  isRestricted          Boolean        @default(false)
-  verificationMessage   String         @default("")
+  author                String           @default("")
+  videoId               String           @default("")
+  views                 Int              @default(0)
+  duration              String           @default("")
+  isNew                 Boolean          @default(false)
+  createdAt             DateTime?        @default(now())
+  isPublic              Boolean          @default(true)
+  featured              Boolean          @default(false)
+  highlight             Boolean          @default(false)
+  categories            Category[]       @relation("Category_videos")
+  onDemandBucket        OnDemandBucket[] @relation("OnDemandBucket_videos")
+  isRestricted          Boolean          @default(false)
+  verificationMessage   String           @default("")
   publishedAt           DateTime?
-  reports               Report[]       @relation("Report_video")
-  origin                String?        @mysql.Text
-  rating                Int?           @default(0)
+  reports               Report[]         @relation("Report_video")
+  origin                String?          @default("on-demand")
+  rating                Int?             @default(0)
 }
 
 model Ad {
@@ -136,6 +137,12 @@ model Category {
   name      String      @unique @default("")
   videos    Video[]     @relation("Category_videos")
   instagram Instagram[] @relation("Category_instagram")
+}
+
+model OnDemandBucket {
+  id     String  @id @default(cuid())
+  name   String  @unique @default("")
+  videos Video[] @relation("OnDemandBucket_videos")
 }
 
 model Instagram {

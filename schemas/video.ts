@@ -251,6 +251,13 @@ export const Video = list({
         description: "Categories associated with this video.",
       },
     }),
+    onDemandBucket: relationship({
+      ref: "OnDemandBucket.videos",
+      many: true,
+      ui: {
+        description: "Buckets in On Demand",
+      },
+    }),
     isRestricted: checkbox({
       defaultValue: undefined,
       label: "Restricted",

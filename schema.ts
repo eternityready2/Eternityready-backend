@@ -6,6 +6,7 @@ import { Video } from "./schemas/video";
 import { Ad, AdStat } from "./schemas/ad";
 import { Category } from "./schemas/category";
 import { Instagram } from "./schemas/instagram";
+import { OnDemandBucket } from "./schemas/onDemandBucket";
 import { Report, ReportReason } from "./schemas/report";
 import { list } from "@keystone-6/core";
 
@@ -176,6 +177,7 @@ export const lists = {
   Ad,
   AdStat,
   Category,
+  OnDemandBucket,
   Instagram,
   Comment,
   UserReaction,

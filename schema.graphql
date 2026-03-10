@@ -463,6 +463,8 @@ type Video {
   highlight: Boolean
   categories(where: CategoryWhereInput! = {}, orderBy: [CategoryOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CategoryWhereUniqueInput): [Category!]
   categoriesCount(where: CategoryWhereInput! = {}): Int
+  onDemandBucket(where: OnDemandBucketWhereInput! = {}, orderBy: [OnDemandBucketOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: OnDemandBucketWhereUniqueInput): [OnDemandBucket!]
+  onDemandBucketCount(where: OnDemandBucketWhereInput! = {}): Int
   isRestricted: Boolean
   verificationMessage: String
   publishedAt: DateTime
@@ -506,6 +508,7 @@ input VideoWhereInput {
   featured: BooleanFilter
   highlight: BooleanFilter
   categories: CategoryManyRelationFilter
+  onDemandBucket: OnDemandBucketManyRelationFilter
   isRestricted: BooleanFilter
   verificationMessage: StringFilter
   publishedAt: DateTimeNullableFilter
@@ -523,6 +526,12 @@ input CategoryManyRelationFilter {
   every: CategoryWhereInput
   some: CategoryWhereInput
   none: CategoryWhereInput
+}
+
+input OnDemandBucketManyRelationFilter {
+  every: OnDemandBucketWhereInput
+  some: OnDemandBucketWhereInput
+  none: OnDemandBucketWhereInput
 }
 
 input IntNullableFilter {
@@ -581,6 +590,7 @@ input VideoUpdateInput {
   featured: Boolean
   highlight: Boolean
   categories: CategoryRelateToManyForUpdateInput
+  onDemandBucket: OnDemandBucketRelateToManyForUpdateInput
   isRestricted: Boolean
   verificationMessage: String
   publishedAt: DateTime
@@ -598,6 +608,13 @@ input CategoryRelateToManyForUpdateInput {
   set: [CategoryWhereUniqueInput!]
   create: [CategoryCreateInput!]
   connect: [CategoryWhereUniqueInput!]
+}
+
+input OnDemandBucketRelateToManyForUpdateInput {
+  disconnect: [OnDemandBucketWhereUniqueInput!]
+  set: [OnDemandBucketWhereUniqueInput!]
+  create: [OnDemandBucketCreateInput!]
+  connect: [OnDemandBucketWhereUniqueInput!]
 }
 
 input VideoUpdateArgs {
@@ -626,6 +643,7 @@ input VideoCreateInput {
   featured: Boolean
   highlight: Boolean
   categories: CategoryRelateToManyForCreateInput
+  onDemandBucket: OnDemandBucketRelateToManyForCreateInput
   isRestricted: Boolean
   verificationMessage: String
   publishedAt: DateTime
@@ -637,6 +655,11 @@ input VideoCreateInput {
 input CategoryRelateToManyForCreateInput {
   create: [CategoryCreateInput!]
   connect: [CategoryWhereUniqueInput!]
+}
+
+input OnDemandBucketRelateToManyForCreateInput {
+  create: [OnDemandBucketCreateInput!]
+  connect: [OnDemandBucketWhereUniqueInput!]
 }
 
 type Ad {
@@ -911,6 +934,47 @@ input VideoRelateToManyForCreateInput {
 input InstagramRelateToManyForCreateInput {
   create: [InstagramCreateInput!]
   connect: [InstagramWhereUniqueInput!]
+}
+
+type OnDemandBucket {
+  id: ID!
+  name: String
+  videos(where: VideoWhereInput! = {}, orderBy: [VideoOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: VideoWhereUniqueInput): [Video!]
+  videosCount(where: VideoWhereInput! = {}): Int
+}
+
+input OnDemandBucketWhereUniqueInput {
+  id: ID
+  name: String
+}
+
+input OnDemandBucketWhereInput {
+  AND: [OnDemandBucketWhereInput!]
+  OR: [OnDemandBucketWhereInput!]
+  NOT: [OnDemandBucketWhereInput!]
+  id: IDFilter
+  name: StringFilter
+  videos: VideoManyRelationFilter
+}
+
+input OnDemandBucketOrderByInput {
+  id: OrderDirection
+  name: OrderDirection
+}
+
+input OnDemandBucketUpdateInput {
+  name: String
+  videos: VideoRelateToManyForUpdateInput
+}
+
+input OnDemandBucketUpdateArgs {
+  where: OnDemandBucketWhereUniqueInput!
+  data: OnDemandBucketUpdateInput!
+}
+
+input OnDemandBucketCreateInput {
+  name: String
+  videos: VideoRelateToManyForCreateInput
 }
 
 type Instagram {
@@ -1266,6 +1330,12 @@ type Mutation {
   updateCategories(data: [CategoryUpdateArgs!]!): [Category]
   deleteCategory(where: CategoryWhereUniqueInput!): Category
   deleteCategories(where: [CategoryWhereUniqueInput!]!): [Category]
+  createOnDemandBucket(data: OnDemandBucketCreateInput!): OnDemandBucket
+  createOnDemandBuckets(data: [OnDemandBucketCreateInput!]!): [OnDemandBucket]
+  updateOnDemandBucket(where: OnDemandBucketWhereUniqueInput!, data: OnDemandBucketUpdateInput!): OnDemandBucket
+  updateOnDemandBuckets(data: [OnDemandBucketUpdateArgs!]!): [OnDemandBucket]
+  deleteOnDemandBucket(where: OnDemandBucketWhereUniqueInput!): OnDemandBucket
+  deleteOnDemandBuckets(where: [OnDemandBucketWhereUniqueInput!]!): [OnDemandBucket]
   createInstagram(data: InstagramCreateInput!): Instagram
   createInstagrams(data: [InstagramCreateInput!]!): [Instagram]
   updateInstagram(where: InstagramWhereUniqueInput!, data: InstagramUpdateInput!): Instagram
@@ -1342,6 +1412,9 @@ type Query {
   category(where: CategoryWhereUniqueInput!): Category
   categories(where: CategoryWhereInput! = {}, orderBy: [CategoryOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CategoryWhereUniqueInput): [Category!]
   categoriesCount(where: CategoryWhereInput! = {}): Int
+  onDemandBucket(where: OnDemandBucketWhereUniqueInput!): OnDemandBucket
+  onDemandBuckets(where: OnDemandBucketWhereInput! = {}, orderBy: [OnDemandBucketOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: OnDemandBucketWhereUniqueInput): [OnDemandBucket!]
+  onDemandBucketsCount(where: OnDemandBucketWhereInput! = {}): Int
   instagram(where: InstagramWhereUniqueInput!): Instagram
   instagrams(where: InstagramWhereInput! = {}, orderBy: [InstagramOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: InstagramWhereUniqueInput): [Instagram!]
   instagramsCount(where: InstagramWhereInput! = {}): Int
