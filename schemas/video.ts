@@ -271,16 +271,21 @@ export const Video = list({
       },
     }),
     reports: relationship({ ref: 'Report.video', many: true }),
-    origin: text({
+    origin: select({
+      options: [
+        { label: 'On-demand', value: 'on-demand' },
+        { label: 'Music', value: 'music' },
+        { label: 'Channels', value: 'channels' },
+        { label: 'Movies', value: 'movies' },
+        { label: 'Radio', value: 'radio' },
+      ],
+      defaultValue: 'on-demand',
       ui: {
-        createView: { fieldMode: "hidden" },
-        itemView: { fieldMode: "read" },
+        displayMode: "segmented-control",
+        itemView: { fieldMode: 'read' },
         description: "Origin of the media (music, channels, movies)",
       },
-      db: { nativeType: "Text", isNullable: true },
-      defaultValue: "on-demand"
     }),
-
     rating: integer({
       defaultValue: 0,
       db: {
