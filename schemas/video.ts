@@ -268,6 +268,24 @@ export const Video = list({
         itemView: { fieldMode: "read" },
       },
     }),
+    videoStatus: select({
+      options: [
+        { label: "Public", value: "public" },
+        { label: "Private", value: "private" },
+        { label: "Deleted", value: "deleted" },
+        { label: "Geo-restricted (US)", value: "geo_restricted" },
+        { label: "Age-restricted", value: "age_restricted" },
+        { label: "Not embeddable", value: "not_embeddable" },
+        { label: "Unknown", value: "unknown" },
+      ],
+      defaultValue: "unknown",
+      ui: {
+        description:
+          "YouTube availability status detected by the verification system.",
+        createView: { fieldMode: "hidden" },
+        itemView: { fieldMode: "read" },
+      },
+    }),
     verificationMessage: text({ defaultValue: "" }),
     publishedAt: timestamp({
       label: "Published on YouTube",

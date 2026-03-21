@@ -91,6 +91,7 @@ model Video {
   categories            Category[]       @relation("Category_videos")
   onDemandBucket        OnDemandBucket[] @relation("OnDemandBucket_videos")
   isRestricted          Boolean          @default(false)
+  videoStatus           String?          @default("unknown")
   verificationMessage   String           @default("")
   publishedAt           DateTime?
   reports               Report[]         @relation("Report_video")

@@ -466,6 +466,7 @@ type Video {
   onDemandBucket(where: OnDemandBucketWhereInput! = {}, orderBy: [OnDemandBucketOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: OnDemandBucketWhereUniqueInput): [OnDemandBucket!]
   onDemandBucketCount(where: OnDemandBucketWhereInput! = {}): Int
   isRestricted: Boolean
+  videoStatus: String
   verificationMessage: String
   publishedAt: DateTime
   reports(where: ReportWhereInput! = {}, orderBy: [ReportOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ReportWhereUniqueInput): [Report!]
@@ -510,6 +511,7 @@ input VideoWhereInput {
   categories: CategoryManyRelationFilter
   onDemandBucket: OnDemandBucketManyRelationFilter
   isRestricted: BooleanFilter
+  videoStatus: StringNullableFilter
   verificationMessage: StringFilter
   publishedAt: DateTimeNullableFilter
   reports: ReportManyRelationFilter
@@ -563,6 +565,7 @@ input VideoOrderByInput {
   featured: OrderDirection
   highlight: OrderDirection
   isRestricted: OrderDirection
+  videoStatus: OrderDirection
   verificationMessage: OrderDirection
   publishedAt: OrderDirection
   origin: OrderDirection
@@ -592,6 +595,7 @@ input VideoUpdateInput {
   categories: CategoryRelateToManyForUpdateInput
   onDemandBucket: OnDemandBucketRelateToManyForUpdateInput
   isRestricted: Boolean
+  videoStatus: String
   verificationMessage: String
   publishedAt: DateTime
   reports: ReportRelateToManyForUpdateInput
@@ -645,6 +649,7 @@ input VideoCreateInput {
   categories: CategoryRelateToManyForCreateInput
   onDemandBucket: OnDemandBucketRelateToManyForCreateInput
   isRestricted: Boolean
+  videoStatus: String
   verificationMessage: String
   publishedAt: DateTime
   reports: ReportRelateToManyForCreateInput
