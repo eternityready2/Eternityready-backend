@@ -689,6 +689,73 @@ export default withAuth(
           }
         });
 
+        // ─── Community Engagement ─────────────────────────────────────
+        app.post('/api/community-engage', async (req, res) => {
+          try {
+            const { title, origin, action } = req.body;
+            if (!title || !origin || !action) {
+              return res.status(400).json({ error: 'title, origin, and action are required' });
+            }
+            if (action !== 'play' && action !== 'like') {
+              return res.status(400).json({ error: 'action must be "play" or "like"' });
+            }
+
+            const existing = await context.sudo().db.CommunityEngagement.findOne({
+              where: { title },
+            });
+
+            if (existing) {
+              const plays = action === 'play' ? existing.plays + 1 : existing.plays;
+              const likes = action === 'like' ? existing.likes + 1 : existing.likes;
+              const communityScore = plays * 1 + likes * 3;
+
+              await context.sudo().db.CommunityEngagement.updateOne({
+                where: { title },
+                data: { plays, likes, communityScore, lastEngagedAt: new Date().toISOString() },
+              });
+
+              return res.json({ status: 'updated', plays, likes, communityScore });
+            } else {
+              const plays = action === 'play' ? 1 : 0;
+              const likes = action === 'like' ? 1 : 0;
+              const communityScore = plays * 1 + likes * 3;
+
+              await context.sudo().db.CommunityEngagement.createOne({
+                data: { title, origin, plays, likes, communityScore, lastEngagedAt: new Date().toISOString() },
+              });
+
+              return res.json({ status: 'created', plays, likes, communityScore });
+            }
+          } catch (e) {
+            console.error('Community engage error:', e);
+            return res.status(500).json({ error: 'Internal server error' });
+          }
+        });
+
+        app.get('/api/community-top', async (req, res) => {
+          try {
+            const originsParam = req.query.origins as string;
+            const take = parseInt(req.query.take as string) || 20;
+
+            if (!originsParam) {
+              return res.status(400).json({ error: 'origins query param is required' });
+            }
+
+            const origins = originsParam.split(',').map(o => o.trim());
+
+            const items = await context.sudo().db.CommunityEngagement.findMany({
+              where: { origin: { in: origins } },
+              orderBy: { communityScore: 'desc' },
+              take,
+            });
+
+            return res.json(items);
+          } catch (e) {
+            console.error('Community top error:', e);
+            return res.status(500).json({ error: 'Internal server error' });
+          }
+        });
+
         app.post('/auth/google', async (req, res) => {
           try {
             const requestContext = await context.withRequest(req, res);

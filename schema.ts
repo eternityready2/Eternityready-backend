@@ -8,6 +8,7 @@ import { Category } from "./schemas/category";
 import { Instagram } from "./schemas/instagram";
 import { OnDemandBucket } from "./schemas/onDemandBucket";
 import { Report, ReportReason } from "./schemas/report";
+import { CommunityEngagement } from "./schemas/communityEngagement";
 import { list } from "@keystone-6/core";
 
 import {
@@ -183,4 +184,5 @@ export const lists = {
   UserReaction,
   Report,
   ReportReason,
+  CommunityEngagement,
 } satisfies Lists;

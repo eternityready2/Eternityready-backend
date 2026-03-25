@@ -212,3 +212,13 @@ model ReportReason {
   reports   Report[]  @relation("Report_reason")
   createdAt DateTime? @default(now())
 }
+
+model CommunityEngagement {
+  id             String    @id @default(cuid())
+  title          String    @unique @default("")
+  origin         String
+  plays          Int?      @default(0)
+  likes          Int?      @default(0)
+  communityScore Int?      @default(0)
+  lastEngagedAt  DateTime? @default(now())
+}

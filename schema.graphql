@@ -1287,6 +1287,67 @@ input ReportReasonCreateInput {
   createdAt: DateTime
 }
 
+type CommunityEngagement {
+  id: ID!
+  title: String
+  origin: String
+  plays: Int
+  likes: Int
+  communityScore: Int
+  lastEngagedAt: DateTime
+}
+
+input CommunityEngagementWhereUniqueInput {
+  id: ID
+  title: String
+}
+
+input CommunityEngagementWhereInput {
+  AND: [CommunityEngagementWhereInput!]
+  OR: [CommunityEngagementWhereInput!]
+  NOT: [CommunityEngagementWhereInput!]
+  id: IDFilter
+  title: StringFilter
+  origin: StringFilter
+  plays: IntNullableFilter
+  likes: IntNullableFilter
+  communityScore: IntNullableFilter
+  lastEngagedAt: DateTimeNullableFilter
+}
+
+input CommunityEngagementOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+  origin: OrderDirection
+  plays: OrderDirection
+  likes: OrderDirection
+  communityScore: OrderDirection
+  lastEngagedAt: OrderDirection
+}
+
+input CommunityEngagementUpdateInput {
+  title: String
+  origin: String
+  plays: Int
+  likes: Int
+  communityScore: Int
+  lastEngagedAt: DateTime
+}
+
+input CommunityEngagementUpdateArgs {
+  where: CommunityEngagementWhereUniqueInput!
+  data: CommunityEngagementUpdateInput!
+}
+
+input CommunityEngagementCreateInput {
+  title: String
+  origin: String
+  plays: Int
+  likes: Int
+  communityScore: Int
+  lastEngagedAt: DateTime
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -1371,6 +1432,12 @@ type Mutation {
   updateReportReasons(data: [ReportReasonUpdateArgs!]!): [ReportReason]
   deleteReportReason(where: ReportReasonWhereUniqueInput!): ReportReason
   deleteReportReasons(where: [ReportReasonWhereUniqueInput!]!): [ReportReason]
+  createCommunityEngagement(data: CommunityEngagementCreateInput!): CommunityEngagement
+  createCommunityEngagements(data: [CommunityEngagementCreateInput!]!): [CommunityEngagement]
+  updateCommunityEngagement(where: CommunityEngagementWhereUniqueInput!, data: CommunityEngagementUpdateInput!): CommunityEngagement
+  updateCommunityEngagements(data: [CommunityEngagementUpdateArgs!]!): [CommunityEngagement]
+  deleteCommunityEngagement(where: CommunityEngagementWhereUniqueInput!): CommunityEngagement
+  deleteCommunityEngagements(where: [CommunityEngagementWhereUniqueInput!]!): [CommunityEngagement]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -1435,6 +1502,9 @@ type Query {
   reportReason(where: ReportReasonWhereUniqueInput!): ReportReason
   reportReasons(where: ReportReasonWhereInput! = {}, orderBy: [ReportReasonOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ReportReasonWhereUniqueInput): [ReportReason!]
   reportReasonsCount(where: ReportReasonWhereInput! = {}): Int
+  communityEngagement(where: CommunityEngagementWhereUniqueInput!): CommunityEngagement
+  communityEngagements(where: CommunityEngagementWhereInput! = {}, orderBy: [CommunityEngagementOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CommunityEngagementWhereUniqueInput): [CommunityEngagement!]
+  communityEngagementsCount(where: CommunityEngagementWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }
