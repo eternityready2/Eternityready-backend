@@ -128,40 +128,9 @@ export default withAuth(
       extendExpressApp: (app, context) => {
         app.use(
           cors({
-            origin: function (origin, callback) {
-              if (!origin) return callback(null, true);
-              if (allowedOrigins.includes(origin)) {
-                return callback(null, true);
-              } else {
-                return callback(new Error("Not allowed by CORS"));
-              }
-            },
+            origin: true,
             methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             allowedHeaders: ["Content-Type", "Authorization", "x-apollo-operation-name"],
-            credentials: true,
-          })
-        );
-
-        app.use(
-          (
-            err: Error,
-            req: Request,
-            res: Response,
-            next: (arg0: Error) => void
-          ) => {
-            if (err instanceof Error && err.message === "Not allowed by CORS") {
-              res
-                .status(403)
-                .json({ error: "CORS Error: Not allowed by CORS" });
-            } else {
-              next(err);
-            }
-          }
-        );
-
-        app.use(
-          cors({
-            origin: true, // permite qualquer origem
             credentials: true,
           })
         );
