@@ -59,7 +59,7 @@ export const searchHandler = async (
       take: PAGE_SIZE,
       skip,
       orderBy: { createdAt: "desc" },
-      query: `  
+      query: `
         id
         sourceType
         videoId
@@ -71,6 +71,7 @@ export const searchHandler = async (
         isNew
         thumbnail { url }
         author
+        origin
         categories { id name }
         reactions {
           id
@@ -125,7 +126,7 @@ export const featuredVideosHandler = async (
         highlight: { equals: true },
         isPublic: { equals: true }
       },
-      query: `  
+      query: `
         id
         sourceType
         title
@@ -137,6 +138,7 @@ export const featuredVideosHandler = async (
         isNew
         thumbnail { url }
         author
+        origin
         categories { id name }
       `,
     });
@@ -175,7 +177,7 @@ export const videoTitleHandler = async (
       where: {
         title: videoTitle,
       },
-      query: `  
+      query: `
         id
         sourceType
         title
@@ -190,6 +192,7 @@ export const videoTitleHandler = async (
         categories { id name }
         embedCode
         views
+        origin
       `,
     });
 
