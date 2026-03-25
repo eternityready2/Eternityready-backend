@@ -122,7 +122,7 @@ export const Ad = list({
     }
   },
   hooks: {
-    resolveInput: async ({ inputData, resolvedData }) => {
+    resolveInput: async ({ inputData, resolvedData, item }) => {
       switch (resolvedData.location) {
         case "header":
           resolvedData.top = "4rem";
@@ -174,8 +174,8 @@ export const Ad = list({
           resolvedData.height = '250px';
           break;
         case 'custom':
-          resolvedData.width = resolvedData.width ?? existingItem?.width ?? '128px';
-          resolvedData.height = resolvedData.height ?? existingItem?.height ?? '128px';
+          resolvedData.width = resolvedData.width ?? item?.width ?? '128px';
+          resolvedData.height = resolvedData.height ?? item?.height ?? '128px';
           break;
       }
       return resolvedData;

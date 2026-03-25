@@ -61,7 +61,7 @@ export const passwordResetHandler = async (
       });
       const secAnswer = secAnswers && secAnswers.length > 0 ? secAnswers[0] : null;
 
-      if (!secAnswer || secAnswer.answer !== answer) {
+      if (!secAnswer || secAnswer.answer.toLowerCase() !== answer.toLowerCase()) {
         return res.status(401).json({ error: 'One or more security answers incorrect' });
       }
     }

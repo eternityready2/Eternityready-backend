@@ -128,15 +128,14 @@ export default withAuth(
       extendExpressApp: (app, context) => {
         app.use(
           cors({
-            // origin: function (origin, callback) {
-            //   if (!origin) return callback(null, true);
-            //   if (allowedOrigins.includes(origin)) {
-            //     return callback(null, true);
-            //   } else {
-            //     return callback(new Error("Not allowed by CORS"));
-            //   }
-            // },
-            origin: "*", // Only for developing
+            origin: function (origin, callback) {
+              if (!origin) return callback(null, true);
+              if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+              } else {
+                return callback(new Error("Not allowed by CORS"));
+              }
+            },
             methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             allowedHeaders: ["Content-Type", "Authorization", "x-apollo-operation-name"],
             credentials: true,
@@ -168,6 +167,11 @@ export default withAuth(
         );
 
         app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+          if (!process.env.STRIPE_WEBHOOK_SECRET) {
+            console.error('STRIPE_WEBHOOK_SECRET not configured');
+            return res.status(500).json({ error: 'Webhook not configured' });
+          }
+
           const sig = req.headers['stripe-signature'];
           let event;
 
@@ -267,6 +271,8 @@ export default withAuth(
         app.post("/api/subscribe", async (req: Request, res: Response) => {
           try {
             const requestContext = await context.withRequest(req, res);
+            const session = await requestContext.session;
+            if (!session) return res.status(401).json({ error: 'Not authenticated' });
 
             if (req.method !== 'POST') {
               return res.status(405).json({ error: 'Method not allowed. Use POST.' });
@@ -448,7 +454,7 @@ export default withAuth(
 
           } catch (error) {
             console.error('API Error:', error);
-            return res.status(200).json({ error: 'Internal server error' });
+            return res.status(500).json({ error: 'Internal server error' });
           }
         });
 
@@ -459,6 +465,8 @@ export default withAuth(
           const userId = req.body.userId ?? session?.itemId ;
 
           const user = await context.sudo().db.User.findOne({ where: { id: userId } });
+
+          if (!user) return res.status(404).json({ error: 'User not found' });
 
           let stripeCustomerId = user.stripeCustomerId;
           if (!stripeCustomerId) {
@@ -564,7 +572,10 @@ export default withAuth(
 
         app.post('/api/react-content', async (req, res) => {
           const requestContext = await context.withRequest(req, res);
-          const { userId, reaction, videoTitle, commentId } = req.body;
+          const session = await requestContext.session;
+          const userId = session?.itemId;
+          if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+          const { reaction, videoTitle, commentId } = req.body;
 
           if (!userId || !reaction || (!videoTitle && !commentId)) {
             return res.status(400).json({ error: 'Missing fields' });
