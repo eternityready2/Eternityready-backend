@@ -701,6 +701,36 @@ export default withAuth(
           }
         });
 
+        // Trending — most engagement in last 48 hours
+        app.get('/api/community-trending', async (req, res) => {
+          try {
+            const originsParam = req.query.origins as string;
+            const take = parseInt(req.query.take as string) || 20;
+            const hoursAgo = parseInt(req.query.hours as string) || 48;
+
+            if (!originsParam) {
+              return res.status(400).json({ error: 'origins query param is required' });
+            }
+
+            const origins = originsParam.split(',').map(o => o.trim());
+            const since = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
+
+            const items = await context.sudo().db.CommunityEngagement.findMany({
+              where: {
+                origin: { in: origins },
+                lastEngagedAt: { gte: since.toISOString() },
+              },
+              orderBy: { communityScore: 'desc' },
+              take,
+            });
+
+            return res.json(items);
+          } catch (e) {
+            console.error('Community trending error:', e);
+            return res.status(500).json({ error: 'Internal server error' });
+          }
+        });
+
         app.get('/api/community-top', async (req, res) => {
           try {
             const originsParam = req.query.origins as string;
