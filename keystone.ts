@@ -526,10 +526,9 @@ export default withAuth(
               return res.status(404).json({ message: 'Video not found' });
             }
 
-            const currentViews = video.views || 0;
             const updated = await requestContext.db.Video.updateOne({
               where: { id: video.id },
-              data: { views: currentViews + 1 }
+              data: { views: (video.views || 0) + 1 }
             });
 
             res.json({ success: true, video: updated });
@@ -603,7 +602,6 @@ export default withAuth(
                 user: { connect: { id: userId } },
                 video: { connect: { id: videoId } },
                 ...(commentId && { comment: { connect: { id: commentId } } }),
-                ...(videoId && { video: { connect: { id: videoId } } })
               },
               query: 'id reaction',
             });
@@ -669,22 +667,8 @@ export default withAuth(
               return res.status(400).json({ error: 'action must be "play" or "like"' });
             }
 
-            const existing = await context.sudo().db.CommunityEngagement.findOne({
-              where: { title },
-            });
-
-            if (existing) {
-              const plays = action === 'play' ? existing.plays + 1 : existing.plays;
-              const likes = action === 'like' ? existing.likes + 1 : existing.likes;
-              const communityScore = plays * 1 + likes * 3;
-
-              await context.sudo().db.CommunityEngagement.updateOne({
-                where: { title },
-                data: { plays, likes, communityScore, lastEngagedAt: new Date().toISOString() },
-              });
-
-              return res.json({ status: 'updated', plays, likes, communityScore });
-            } else {
+            // Upsert pattern: try create first, catch unique constraint and update
+            try {
               const plays = action === 'play' ? 1 : 0;
               const likes = action === 'like' ? 1 : 0;
               const communityScore = plays * 1 + likes * 3;
@@ -694,6 +678,27 @@ export default withAuth(
               });
 
               return res.json({ status: 'created', plays, likes, communityScore });
+            } catch (createErr: any) {
+              // Unique constraint violation — record already exists, update it
+              if (createErr?.code === 'P2002' || createErr?.message?.includes('Unique constraint')) {
+                const existing = await context.sudo().db.CommunityEngagement.findOne({
+                  where: { title },
+                });
+                if (!existing) {
+                  return res.status(500).json({ error: 'Internal server error' });
+                }
+                const plays = action === 'play' ? existing.plays + 1 : existing.plays;
+                const likes = action === 'like' ? existing.likes + 1 : existing.likes;
+                const communityScore = plays * 1 + likes * 3;
+
+                await context.sudo().db.CommunityEngagement.updateOne({
+                  where: { title },
+                  data: { plays, likes, communityScore, lastEngagedAt: new Date().toISOString() },
+                });
+
+                return res.json({ status: 'updated', plays, likes, communityScore });
+              }
+              throw createErr;
             }
           } catch (e) {
             console.error('Community engage error:', e);
@@ -705,8 +710,8 @@ export default withAuth(
         app.get('/api/community-trending', async (req, res) => {
           try {
             const originsParam = req.query.origins as string;
-            const take = parseInt(req.query.take as string) || 20;
-            const hoursAgo = parseInt(req.query.hours as string) || 48;
+            const take = Math.min(Math.max(parseInt(req.query.take as string) || 20, 1), 100);
+            const hoursAgo = Math.min(Math.max(parseInt(req.query.hours as string) || 48, 1), 720);
 
             if (!originsParam) {
               return res.status(400).json({ error: 'origins query param is required' });
@@ -734,7 +739,7 @@ export default withAuth(
         app.get('/api/community-top', async (req, res) => {
           try {
             const originsParam = req.query.origins as string;
-            const take = parseInt(req.query.take as string) || 20;
+            const take = Math.min(Math.max(parseInt(req.query.take as string) || 20, 1), 100);
 
             if (!originsParam) {
               return res.status(400).json({ error: 'origins query param is required' });
